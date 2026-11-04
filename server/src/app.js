@@ -4,12 +4,14 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import routes from './routes/index.js';
+import { isOriginAllowed, parseAllowedOrigins } from './utils/origins.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 export function createApp() {
   const app = express();
   app.use(helmet());
-  app.use(cors({ origin: env.clientUrl.split(',').map((s) => s.trim()) }));
+  const allowedOrigins = parseAllowedOrigins(env.clientUrl);
+  app.use(cors({ origin: (origin, cb) => cb(null, isOriginAllowed(origin, allowedOrigins)) }));
   app.use(express.json({ limit: '100kb' }));
   if (process.env.NODE_ENV !== 'test') app.use(morgan(env.isProduction ? 'combined' : 'dev'));
 

@@ -8,7 +8,7 @@ services:
     region: frankfurt
     branch: develop
     rootDir: server
-    buildCommand: npm ci --include=dev && npm run db:migrate && npm run db:seed:if-empty
+    buildCommand: npm ci --include=dev && npm run db:migrate && npm run db:seed:if-empty && npm run covers:rawg:optional
     startCommand: npm start
     healthCheckPath: /api/v1/health
     envVars:

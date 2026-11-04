@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "covers:rawg": "node src/scripts/fetch-covers-rawg.js",
     "test:integration": "vitest run --config vitest.integration.config.js",
-    "db:seed:if-empty": "node src/db/seed.js --if-empty"
+    "db:seed:if-empty": "node src/db/seed.js --if-empty",
+    "covers:rawg:optional": "node src/scripts/fetch-covers-rawg.js --optional"
   },
   "author": "",
   "license": "MIT",
