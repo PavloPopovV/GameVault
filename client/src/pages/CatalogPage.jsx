@@ -44,8 +44,13 @@ export default function CatalogPage() {
       setAdded((s) => new Set(s).add(game.id));
       toast.success(`«${game.title}» додано в бібліотеку`);
     } catch (err) {
-      if (err.status === 409) setAdded((s) => new Set(s).add(game.id));
-      toast.error(err.message);
+      if (err.status === 409) {
+        // Гра вже в бібліотеці — це не помилка, просто синхронізуємо картку
+        setAdded((s) => new Set(s).add(game.id));
+        toast.info(`«${game.title}» вже є у вашій бібліотеці`);
+      } else {
+        toast.error(err.message);
+      }
     }
   };
 
