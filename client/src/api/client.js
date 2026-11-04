@@ -65,6 +65,7 @@ export const api = {
   me: () => request('/users/me'),
   updateMe: (body) => request('/users/me', { method: 'PATCH', body }),
   myReviews: () => request('/users/me/reviews'),
+  deleteMe: (password) => request('/users/me', { method: 'DELETE', body: { password } }),
 
   genres: () => request('/genres'),
   platforms: () => request('/platforms'),

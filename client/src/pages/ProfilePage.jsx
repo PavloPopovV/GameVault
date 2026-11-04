@@ -6,8 +6,9 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
 import GameCover from '../components/GameCover.jsx';
 import Modal from '../components/Modal.jsx';
+import ActionsMenu from '../components/ActionsMenu.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
-import { STATUSES, formatDate, pluralUk } from '../utils/constants.js';
+import { STATUSES, formatDate } from '../utils/constants.js';
 
 const FieldError = ({ errors, field }) => (errors[field] ? <span className="field__error" role="alert">{errors[field]}</span> : null);
 
@@ -76,6 +77,47 @@ function EditProfileForm({ user, onDone }) {
   );
 }
 
+function DeleteAccountForm({ onCancel }) {
+  const { logout } = useAuth();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await api.deleteMe(password);
+      logout();
+      navigate('/', { replace: true });
+      toast.success('Акаунт видалено');
+    } catch (err) {
+      setError(err.details?.[0]?.message ?? err.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className="form" onSubmit={submit} noValidate>
+      <p className="modal__text">
+        Буде назавжди видалено бібліотеку, Wishlist і всі ваші рецензії. Цю дію <b>не можна скасувати</b>.
+      </p>
+      <label className="field">
+        <span className="field__label">Введіть пароль, щоб підтвердити</span>
+        <input type="password" className={`input ${error ? 'input--error' : ''}`} value={password} autoComplete="current-password"
+          onChange={(e) => { setPassword(e.target.value); setError(''); }} required />
+        {error && <span className="field__error" role="alert">{error}</span>}
+      </label>
+      <div className="modal__actions">
+        <button type="button" className="btn btn--ghost" onClick={onCancel}>Скасувати</button>
+        <button type="submit" className="btn btn--danger-solid" disabled={busy || !password}>{busy ? 'Видаляємо…' : 'Видалити назавжди'}</button>
+      </div>
+    </form>
+  );
+}
+
 function MyReviews({ count }) {
   const list = useAsync(() => api.myReviews(), [count]);
   return (
@@ -111,8 +153,9 @@ function MyReviews({ count }) {
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [editing, setEditing] = useState(false);
+  const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | null
   const onLogout = () => { logout(); navigate('/', { replace: true }); };
+  const closeDialog = () => setDialog(null);
   const s = user.stats;
   const bio = user.profile.bio?.trim();
 
@@ -123,10 +166,15 @@ export default function ProfilePage() {
         <div className="profile__info">
           <h1 className="page-title">{user.username}</h1>
           {bio ? <p className="profile__bio">{bio}</p> : <p className="profile__bio profile__bio--empty">Розкажіть, у які ігри любите грати</p>}
-          <p className="profile__meta">{user.email} · з нами з {formatDate(user.createdAt)} · {s.reviewsCount} {pluralUk(s.reviewsCount, ['рецензія', 'рецензії', 'рецензій'])}</p>
-          <button type="button" className="btn btn--secondary btn--sm profile__edit" onClick={() => setEditing(true)}>Редагувати профіль</button>
+          <p className="profile__meta">{user.email} · з нами з {formatDate(user.createdAt)}</p>
         </div>
-        <button type="button" className="btn btn--secondary btn--sm profile__logout" onClick={onLogout}>Вийти з акаунту</button>
+        <div className="profile__actions">
+          <ActionsMenu label="Дії з акаунтом" items={[
+            { label: 'Редагувати профіль', onSelect: () => setDialog('edit') },
+            { label: 'Вийти з акаунту', onSelect: onLogout },
+            { label: 'Видалити акаунт', onSelect: () => setDialog('delete'), danger: true, divider: true },
+          ]} />
+        </div>
       </header>
 
       <section className="stats">
@@ -152,8 +200,11 @@ export default function ProfilePage() {
 
       <MyReviews count={s.reviewsCount} />
 
-      <Modal open={editing} title="Редагувати профіль" onClose={() => setEditing(false)}>
-        <EditProfileForm user={user} onDone={() => setEditing(false)} />
+      <Modal open={dialog === 'edit'} title="Редагувати профіль" onClose={closeDialog}>
+        <EditProfileForm user={user} onDone={closeDialog} />
+      </Modal>
+      <Modal open={dialog === 'delete'} title="Видалити акаунт?" onClose={closeDialog}>
+        <DeleteAccountForm onCancel={closeDialog} />
       </Modal>
     </div>
   );
