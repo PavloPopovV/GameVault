@@ -24,10 +24,10 @@ export class ApiError extends Error {
 let onUnauthorized = () => {};
 export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 
-// Викликається після успішної зміни бібліотеки або Wishlist — щоб оновити лічильники в шапці
+// Викликається після успішної зміни бібліотеки, Wishlist або рецензій — щоб оновити лічильники і статистику
 let onCollectionChange = () => {};
 export const setCollectionChangeHandler = (fn) => { onCollectionChange = fn; };
-const COLLECTION_PATH = /^\/(library|wishlist)(\/|$)/;
+const COLLECTION_PATH = /^\/(library|wishlist|reviews)(\/|$)|^\/games\/[^/]+\/reviews$/;
 
 export async function request(path, { method = 'GET', body, query, auth = true } = {}) {
   const url = new URL(BASE + path, window.location.origin);
@@ -64,6 +64,8 @@ export const api = {
   login: (body) => request('/auth/login', { method: 'POST', body, auth: false }),
   me: () => request('/users/me'),
   updateMe: (body) => request('/users/me', { method: 'PATCH', body }),
+  myReviews: () => request('/users/me/reviews'),
+  deleteMe: (password) => request('/users/me', { method: 'DELETE', body: { password } }),
 
   genres: () => request('/genres'),
   platforms: () => request('/platforms'),
