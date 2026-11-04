@@ -1,13 +1,14 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { libraryEntries, reviews, users } from '../db/schema.js';
+import { libraryEntries, profiles, reviews, users } from '../db/schema.js';
+import { avatarPath } from '../domain/avatar.js';
 import { canModifyReview, canReviewGame } from '../domain/review.js';
 import { conflict, forbidden, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
 
 export async function listGameReviews(gameId, { page = 1, limit = 20 } = {}) {
   await ensureGameExists(gameId);
-  return db
+  const rows = await db
     .select({
       id: reviews.id,
       rating: reviews.rating,
@@ -15,13 +16,19 @@ export async function listGameReviews(gameId, { page = 1, limit = 20 } = {}) {
       createdAt: reviews.createdAt,
       updatedAt: reviews.updatedAt,
       author: { id: users.id, username: users.username },
+      avatarUpdatedAt: profiles.avatarUpdatedAt,
     })
     .from(reviews)
     .innerJoin(users, eq(users.id, reviews.userId))
+    .leftJoin(profiles, eq(profiles.userId, reviews.userId))
     .where(eq(reviews.gameId, gameId))
     .orderBy(desc(reviews.createdAt))
     .limit(limit)
     .offset((page - 1) * limit);
+  return rows.map(({ avatarUpdatedAt, author, ...r }) => ({
+    ...r,
+    author: { ...author, avatarUrl: avatarPath(author.id, avatarUpdatedAt) },
+  }));
 }
 
 export async function createReview(user, gameId, { rating, text }) {

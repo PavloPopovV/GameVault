@@ -216,3 +216,37 @@ describe('Delete account API', () => {
     ).toBe(403);
   });
 });
+
+describe('Avatar API', () => {
+  const JPEG = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
+  const dataUrl = `data:image/jpeg;base64,${JPEG.toString('base64')}`;
+
+  it('завантаження → avatarUrl у профілі й рецензіях, роздача картинки, видалення', async () => {
+    const token = await registerUser('kate');
+    const auth = { Authorization: `Bearer ${token}` };
+    expect((await api('get', '/users/me').set(auth)).body.avatarUrl).toBeNull();
+
+    const bad = await api('put', '/users/me/avatar').set(auth).send({ image: 'data:image/png;base64,PGh0bWw+' });
+    expect(bad.status).toBe(400);
+
+    const up = await api('put', '/users/me/avatar').set(auth).send({ image: dataUrl });
+    expect(up.status).toBe(200);
+    const url = up.body.avatarUrl;
+    expect(url).toMatch(new RegExp(`^/api/v1/users/${up.body.id}/avatar\\?v=\\d+$`));
+
+    const img = await request(app).get(url);
+    expect(img.status).toBe(200);
+    expect(img.headers['content-type']).toBe('image/jpeg');
+    expect(img.headers['cross-origin-resource-policy']).toBe('cross-origin');
+    expect(Buffer.compare(img.body, JPEG)).toBe(0);
+
+    await api('post', '/library').set(auth).send({ gameId });
+    await api('post', `/games/${gameId}/reviews`).set(auth).send({ rating: 8, text: 'Тест аватарки в рецензії' });
+    const list = await api('get', `/games/${gameId}/reviews`);
+    expect(list.body.find((r) => r.author.username === 'kate').author.avatarUrl).toBe(url);
+
+    const del = await api('delete', '/users/me/avatar').set(auth);
+    expect(del.body.avatarUrl).toBeNull();
+    expect((await request(app).get(url)).status).toBe(404);
+  });
+});
