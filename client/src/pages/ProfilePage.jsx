@@ -145,8 +145,40 @@ function AvatarPreview({ image, onDone }) {
   );
 }
 
-function MyReviews({ count }) {
-  const list = useAsync(() => api.myReviews(), [count]);
+// Картка статистики: фон — обкладинка тематичної гри з бібліотеки, під текстом — акцентне розмиття
+function StatCard({ value, label, cover, to }) {
+  const content = (
+    <>
+      {cover ? <img className="stat__bg" src={cover} alt="" aria-hidden="true" loading="lazy" /> : <span className="stat__bg stat__bg--empty" aria-hidden="true" />}
+      <span className="stat__glow" aria-hidden="true" />
+      <span className="stat__body">
+        <span className="stat__value">{value}</span>
+        <span className="stat__label">{label}</span>
+      </span>
+    </>
+  );
+  return to ? <Link to={to} className="stat card">{content}</Link> : <div className="stat card">{content}</div>;
+}
+
+function ProfileStats({ stats: s, reviews }) {
+  // Бібліотека й Wishlist — лише заради обкладинок для фонів карток
+  const lists = useAsync(() => Promise.all([api.library(), api.wishlist()]), [s.totalGames, s.wishlistCount]);
+  const [library = [], wishlist = []] = lists.data ?? [];
+  const cover = (x) => x?.game?.coverUrl ?? null;
+  const topRated = [...(reviews ?? [])].sort((a, b) => b.rating - a.rating)[0];
+  return (
+    <section className="stats">
+      <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={cover(library[0])} />
+      <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED"
+        cover={cover(library.find((e) => e.status === 'COMPLETED'))} />
+      <StatCard value={s.reviewsCount} label="рецензій" cover={cover(reviews?.[0])} />
+      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={cover(topRated)} />
+      <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={cover(wishlist[0])} />
+    </section>
+  );
+}
+
+function MyReviews({ list }) {
   return (
     <section className="profile__reviews">
       <h2 className="section-title">Мої рецензії{list.data?.length ? <span className="muted"> · {list.data.length}</span> : null}</h2>
@@ -197,6 +229,7 @@ export default function ProfilePage() {
   const onLogout = () => { logout(); navigate('/', { replace: true }); };
   const closeDialog = () => setDialog(null);
   const s = user.stats;
+  const reviews = useAsync(() => api.myReviews(), [s.reviewsCount]);
   const bio = user.profile.bio?.trim();
 
   return (
@@ -225,13 +258,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <section className="stats">
-        <div className="stat card"><span className="stat__value">{s.totalGames}</span><span className="stat__label">ігор у бібліотеці</span></div>
-        <div className="stat card"><span className="stat__value">{s.completionRate}%</span><span className="stat__label">пройдено</span></div>
-        <div className="stat card"><span className="stat__value">{s.reviewsCount}</span><span className="stat__label">рецензій</span></div>
-        <div className="stat card"><span className="stat__value">★ {s.averageGivenRating ?? '—'}</span><span className="stat__label">середня оцінка</span></div>
-        <div className="stat card"><span className="stat__value">{s.wishlistCount}</span><span className="stat__label">у Wishlist</span></div>
-      </section>
+      <ProfileStats stats={s} reviews={reviews.data} />
 
       <section className="card status-breakdown">
         <h2 className="section-title">За статусами</h2>
@@ -246,7 +273,7 @@ export default function ProfilePage() {
         </ul>
       </section>
 
-      <MyReviews count={s.reviewsCount} />
+      <MyReviews list={reviews} />
 
       <Modal open={dialog === 'edit'} title="Редагувати профіль" onClose={closeDialog}>
         <EditProfileForm user={user} onDone={closeDialog} />
