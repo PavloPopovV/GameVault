@@ -8,6 +8,7 @@ import GameCover from '../components/GameCover.jsx';
 import Modal from '../components/Modal.jsx';
 import ActionsMenu from '../components/ActionsMenu.jsx';
 import Avatar from '../components/Avatar.jsx';
+import PlayerProgress from '../components/PlayerProgress.jsx';
 import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
@@ -284,18 +285,7 @@ export default function ProfilePage() {
 
       <ProfileStats stats={s} reviews={reviews.data} />
 
-      <section className="card status-breakdown">
-        <h2 className="section-title">За статусами</h2>
-        <ul>
-          {STATUSES.map((st) => (
-            <li key={st.value}>
-              <Link to={`/library?status=${st.value}`}>{st.label}</Link>
-              <span className="status-breakdown__bar"><span style={{ width: `${s.totalGames ? (s.byStatus[st.value] / s.totalGames) * 100 : 0}%` }} className={`status--${st.value.toLowerCase()}`} /></span>
-              <strong>{s.byStatus[st.value]}</strong>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <PlayerProgress stats={s} />
 
       <MyReviews list={reviews} />
 
