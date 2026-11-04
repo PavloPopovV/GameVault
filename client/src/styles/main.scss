@@ -152,6 +152,11 @@ p { margin: 0; }
 .chip--static { cursor: default; height: 28px; background: var(--surface-2); }
 .badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
 .badge--success { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+.badge--status {
+  display: inline-flex; align-items: center; gap: 8px; height: var(--control-h-xs); padding: 0 12px; border-radius: 8px;
+  font-size: 13px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); transition: border-color 0.15s;
+  &:hover { border-color: var(--border-hover); }
+}
 .rating { color: var(--star); font-weight: 700; }
 .rating--lg { font-size: 30px; font-weight: 800; }
 .avatar {
