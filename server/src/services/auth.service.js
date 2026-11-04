@@ -21,7 +21,9 @@ export async function register({ email, username, password }) {
     where: or(eq(users.email, normalizedEmail), eq(users.username, username)),
   });
   if (existing) {
-    throw conflict(existing.email === normalizedEmail ? 'Цей Email вже зайнятий' : 'Цей нікнейм вже зайнятий');
+    const field = existing.email === normalizedEmail ? 'email' : 'username';
+    const message = field === 'email' ? 'Цей Email вже зайнятий' : 'Цей нікнейм вже зайнятий';
+    throw conflict(message, [{ field, message }]);
   }
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await db.transaction(async (tx) => {

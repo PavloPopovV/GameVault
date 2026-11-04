@@ -11,6 +11,12 @@ export default function Layout() {
   const location = useLocation();
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
   useEffect(() => { setQ(params.get('q') ?? ''); }, [params]);
 
   const onSearch = (e) => {

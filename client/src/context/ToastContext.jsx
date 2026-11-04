@@ -1,17 +1,28 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 const ToastContext = createContext(null);
 let nextId = 1;
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
+  const timers = useRef(new Map());
 
-  const dismiss = useCallback((id) => setToasts((t) => t.filter((x) => x.id !== id)), []);
+  const dismiss = useCallback((id) => {
+    clearTimeout(timers.current.get(id));
+    timers.current.delete(id);
+    setToasts((t) => t.filter((x) => x.id !== id));
+  }, []);
   const push = useCallback((type, message) => {
     const id = nextId++;
     setToasts((t) => [...t, { id, type, message }]);
-    setTimeout(() => dismiss(id), 4000);
+    timers.current.set(id, setTimeout(() => dismiss(id), 4000));
   }, [dismiss]);
+
+  // Прибираємо всі таймери при розмонтуванні провайдера
+  useEffect(() => {
+    const map = timers.current;
+    return () => { map.forEach(clearTimeout); map.clear(); };
+  }, []);
 
   const value = useMemo(() => ({
     success: (m) => push('success', m),
