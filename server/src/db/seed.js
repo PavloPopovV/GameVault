@@ -218,6 +218,14 @@ const STEAM_APP_IDS = {
 const steamCover = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`;
 
 async function main() {
+  // --if-empty: безпечний режим для деплою — не чіпає БД, якщо дані вже є
+  if (process.argv.includes('--if-empty')) {
+    const [{ count }] = await db.select({ count: sql`count(*)`.mapWith(Number) }).from(games);
+    if (count > 0) {
+      console.log(`Seed пропущено: у БД вже є ${count} ігор.`);
+      return;
+    }
+  }
   console.log('Seeding…');
   await db.execute(sql`TRUNCATE ${reviews}, ${wishlistItems}, ${libraryEntries}, ${gameGenres}, ${gamePlatforms},
     ${games}, ${genres}, ${platforms}, ${profiles}, ${users} RESTART IDENTITY CASCADE`);
