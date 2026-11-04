@@ -48,7 +48,7 @@ export default function GamePage() {
     me?.libraryStatus ? 'Статус оновлено' : 'Гру додано в бібліотеку',
   );
   const onRemove = () => {
-    // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-20)
+    // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-21)
     if (me?.reviewId && !window.confirm('Разом з грою буде видалено вашу рецензію. Продовжити?')) return;
     run(async () => { await api.removeFromLibrary(g.id); if (me?.reviewId) await reviews.reload(); }, 'Гру прибрано з бібліотеки');
   };

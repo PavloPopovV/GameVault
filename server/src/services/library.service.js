@@ -19,7 +19,7 @@ export async function listLibrary(userId, status) {
     }),
     db.select({ gameId: reviews.gameId }).from(reviews).where(eq(reviews.userId, userId)),
   ]);
-  // hasReview — щоб попередити, що разом з грою з бібліотеки зникне й рецензія (GV-20)
+  // hasReview — щоб попередити, що разом з грою з бібліотеки зникне й рецензія (GV-21)
   const reviewed = new Set(myReviews.map((r) => r.gameId));
   return entries.map((e) => ({ ...e, hasReview: reviewed.has(e.gameId) }));
 }
@@ -48,7 +48,7 @@ export async function changeStatus(userId, gameId, status) {
   return updated;
 }
 
-/** Прибирає гру з бібліотеки разом із рецензією на неї: рецензія можлива лише на гру з бібліотеки (GV-20). */
+/** Прибирає гру з бібліотеки разом із рецензією на неї: рецензія можлива лише на гру з бібліотеки (GV-21). */
 export async function removeFromLibrary(userId, gameId) {
   await db.transaction(async (tx) => {
     const res = await tx

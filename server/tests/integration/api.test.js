@@ -100,7 +100,7 @@ describe('Catalog + Library + Reviews API', () => {
   it('рецензія: валідація 400, створення, середня оцінка, чужа рецензія 403', async () => {
     const t1 = await registerUser('carol');
     const t2 = await registerUser('dave');
-    // GV-20: рецензія лише на гру з бібліотеки — без запису в бібліотеці 403
+    // GV-21: рецензія лише на гру з бібліотеки — без запису в бібліотеці 403
     expect(
       (
         await api('post', `/games/${gameId}/reviews`)
@@ -178,7 +178,7 @@ describe('Profile API', () => {
   });
 });
 
-describe('GV-20: рецензії й бібліотека узгоджені', () => {
+describe('GV-21: рецензії й бібліотека узгоджені', () => {
   it('прибрати гру з бібліотеки → рецензія на неї теж видаляється', async () => {
     const token = await registerUser('judy');
     const auth = { Authorization: `Bearer ${token}` };

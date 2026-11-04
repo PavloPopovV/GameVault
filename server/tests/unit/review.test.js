@@ -61,7 +61,7 @@ describe('canModifyReview', () => {
   });
 });
 
-describe('canReviewGame (GV-20)', () => {
+describe('canReviewGame (GV-21)', () => {
   it('гра в бібліотеці з будь-яким статусом — можна писати рецензію', () => {
     for (const status of ['WANT_TO_PLAY', 'PLAYING', 'COMPLETED', 'DROPPED']) {
       expect(canReviewGame({ gameId: 'g1', status })).toBe(true);
