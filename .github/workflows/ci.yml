@@ -45,10 +45,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        if: hashFiles('client/package-lock.json') != ''
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: client/package-lock.json
       - run: npm ci
+        if: hashFiles('client/package-lock.json') != ''
       - run: npm run lint
+        if: hashFiles('client/package-lock.json') != ''
       - run: npm run build
+        if: hashFiles('client/package-lock.json') != ''
