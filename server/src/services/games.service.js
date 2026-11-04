@@ -46,7 +46,15 @@ async function attachLibraryStatus(rows, user) {
   const entries = await db
     .select({ gameId: libraryEntries.gameId, status: libraryEntries.status })
     .from(libraryEntries)
-    .where(and(eq(libraryEntries.userId, user.id), inArray(libraryEntries.gameId, rows.map((r) => r.id))));
+    .where(
+      and(
+        eq(libraryEntries.userId, user.id),
+        inArray(
+          libraryEntries.gameId,
+          rows.map((r) => r.id),
+        ),
+      ),
+    );
   const byGame = new Map(entries.map((e) => [e.gameId, e.status]));
   return rows.map((r) => ({ ...r, libraryStatus: byGame.get(r.id) ?? null }));
 }

@@ -42,6 +42,32 @@ r.delete(
     res.status(204).end();
   }),
 );
+r.put(
+  '/users/me/avatar',
+  requireAuth,
+  validate(S.avatarSchema),
+  h(async (req, res) => res.json(await usersSvc.setAvatar(req.user.id, req.body.image))),
+);
+r.delete(
+  '/users/me/avatar',
+  requireAuth,
+  h(async (req, res) => res.json(await usersSvc.removeAvatar(req.user.id))),
+);
+// Публічна картинка: <img> з іншого домену (Vercel) — тому CORP cross-origin.
+// URL містить ?v=<час оновлення>, тож кешувати можна «назавжди».
+r.get(
+  '/users/:id/avatar',
+  validate(S.uuidParam('id'), 'params'),
+  h(async (req, res) => {
+    const { avatar, mime } = await usersSvc.getAvatar(req.params.id);
+    res.set({
+      'Content-Type': mime,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+    });
+    res.send(avatar);
+  }),
+);
 r.get(
   '/users/me/reviews',
   requireAuth,

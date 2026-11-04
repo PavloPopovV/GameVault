@@ -1,4 +1,8 @@
-const BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1`;
+const API_ORIGIN = import.meta.env.VITE_API_URL || '';
+const BASE = `${API_ORIGIN}/api/v1`;
+
+/** Шлях з API (напр., фото профілю) → повна адреса з урахуванням домену бекенду. */
+export const assetUrl = (path) => (path ? `${API_ORIGIN}${path}` : null);
 const TOKEN_KEY = 'gv_token';
 
 export const tokenStorage = {
@@ -65,6 +69,8 @@ export const api = {
   me: () => request('/users/me'),
   updateMe: (body) => request('/users/me', { method: 'PATCH', body }),
   myReviews: () => request('/users/me/reviews'),
+  uploadAvatar: (image) => request('/users/me/avatar', { method: 'PUT', body: { image } }),
+  removeAvatar: () => request('/users/me/avatar', { method: 'DELETE' }),
   deleteMe: (password) => request('/users/me', { method: 'DELETE', body: { password } }),
 
   genres: () => request('/genres'),

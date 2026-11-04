@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import Avatar from './Avatar.jsx';
 
 // Бейдж-лічильник як у кошика магазину: лише коли є хоча б одна гра.
 // key={value} перезапускає анімацію «підстрибування» при кожній зміні числа.
@@ -69,7 +70,7 @@ export default function Layout() {
             )}
             {isAuthenticated ? (
               <NavLink to="/profile" className="nav__link nav__profile" aria-label={`Профіль ${user.username}`} title="Мій профіль">
-                <span className="avatar" aria-hidden="true">{user.username[0].toUpperCase()}</span>
+                <Avatar name={user.username} avatarUrl={user.avatarUrl} />
                 <span className="nav__profile-label" aria-hidden="true">Мій профіль</span>
               </NavLink>
             ) : (

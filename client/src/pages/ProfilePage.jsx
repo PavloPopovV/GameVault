@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -7,6 +7,8 @@ import { useAsync } from '../hooks/useAsync.js';
 import GameCover from '../components/GameCover.jsx';
 import Modal from '../components/Modal.jsx';
 import ActionsMenu from '../components/ActionsMenu.jsx';
+import Avatar from '../components/Avatar.jsx';
+import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
@@ -118,8 +120,65 @@ function DeleteAccountForm({ onCancel }) {
   );
 }
 
-function MyReviews({ count }) {
-  const list = useAsync(() => api.myReviews(), [count]);
+function AvatarPreview({ image, onDone }) {
+  const { refresh } = useAuth();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    try {
+      await api.uploadAvatar(image);
+      await refresh();
+      toast.success('Фото профілю оновлено');
+      onDone();
+    } catch (err) { toast.error(err.message); setBusy(false); }
+  };
+  return (
+    <div className="form">
+      <div className="avatar-preview"><img src={image} alt="Попередній перегляд нового фото" /></div>
+      <p className="muted avatar-preview__hint">Фото обрізано до квадрата по центру.</p>
+      <div className="modal__actions">
+        <button type="button" className="btn btn--ghost" onClick={onDone}>Скасувати</button>
+        <button type="button" className="btn btn--primary" onClick={save} disabled={busy}>{busy ? 'Зберігаємо…' : 'Зберегти фото'}</button>
+      </div>
+    </div>
+  );
+}
+
+// Картка статистики: фон — обкладинка тематичної гри з бібліотеки, під текстом — акцентне розмиття
+function StatCard({ value, label, cover, to }) {
+  const content = (
+    <>
+      {cover ? <img className="stat__bg" src={cover} alt="" aria-hidden="true" loading="lazy" /> : <span className="stat__bg stat__bg--empty" aria-hidden="true" />}
+      <span className="stat__glow" aria-hidden="true" />
+      <span className="stat__body">
+        <span className="stat__value">{value}</span>
+        <span className="stat__label">{label}</span>
+      </span>
+    </>
+  );
+  return to ? <Link to={to} className="stat card">{content}</Link> : <div className="stat card">{content}</div>;
+}
+
+function ProfileStats({ stats: s, reviews }) {
+  // Бібліотека й Wishlist — лише заради обкладинок для фонів карток
+  const lists = useAsync(() => Promise.all([api.library(), api.wishlist()]), [s.totalGames, s.wishlistCount]);
+  const [library = [], wishlist = []] = lists.data ?? [];
+  const cover = (x) => x?.game?.coverUrl ?? null;
+  const topRated = [...(reviews ?? [])].sort((a, b) => b.rating - a.rating)[0];
+  return (
+    <section className="stats">
+      <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={cover(library[0])} />
+      <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED"
+        cover={cover(library.find((e) => e.status === 'COMPLETED'))} />
+      <StatCard value={s.reviewsCount} label="рецензій" cover={cover(reviews?.[0])} />
+      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={cover(topRated)} />
+      <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={cover(wishlist[0])} />
+    </section>
+  );
+}
+
+function MyReviews({ list }) {
   return (
     <section className="profile__reviews">
       <h2 className="section-title">Мої рецензії{list.data?.length ? <span className="muted"> · {list.data.length}</span> : null}</h2>
@@ -151,39 +210,55 @@ function MyReviews({ count }) {
 }
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
   const navigate = useNavigate();
-  const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | null
+  const toast = useToast();
+  const fileRef = useRef(null);
+  const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | 'avatar' | null
+  const [newAvatar, setNewAvatar] = useState(null);
+  const pickPhoto = () => fileRef.current?.click();
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // щоб повторний вибір того самого файлу теж спрацював
+    if (!file) return;
+    try { setNewAvatar(await prepareAvatar(file)); setDialog('avatar'); } catch (err) { toast.error(err.message); }
+  };
+  const removePhoto = async () => {
+    try { await api.removeAvatar(); await refresh(); toast.success('Фото профілю видалено'); } catch (err) { toast.error(err.message); }
+  };
   const onLogout = () => { logout(); navigate('/', { replace: true }); };
   const closeDialog = () => setDialog(null);
   const s = user.stats;
+  const reviews = useAsync(() => api.myReviews(), [s.reviewsCount]);
   const bio = user.profile.bio?.trim();
 
   return (
     <div className="profile">
       <header className="profile__head">
-        <span className="avatar avatar--lg" aria-hidden="true">{user.username[0].toUpperCase()}</span>
+        <button type="button" className="profile__avatar" onClick={pickPhoto} aria-label={user.avatarUrl ? 'Змінити фото профілю' : 'Додати фото профілю'}>
+          <Avatar name={user.username} avatarUrl={user.avatarUrl} size="lg" />
+          <span className="profile__avatar-overlay" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+          </span>
+        </button>
+        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onFile} />
         <div className="profile__info">
           <h1 className="page-title">{user.username}</h1>
           {bio ? <p className="profile__bio">{bio}</p> : <p className="profile__bio profile__bio--empty">Розкажіть, у які ігри любите грати</p>}
-          <p className="profile__meta">{user.email} · з нами з {formatDate(user.createdAt)}</p>
+          <p className="profile__meta">З нами з {formatDate(user.createdAt)}</p>
         </div>
         <div className="profile__actions">
           <ActionsMenu label="Дії з акаунтом" items={[
             { label: 'Редагувати профіль', onSelect: () => setDialog('edit') },
+            { label: user.avatarUrl ? 'Змінити фото' : 'Додати фото', onSelect: pickPhoto },
+            ...(user.avatarUrl ? [{ label: 'Видалити фото', onSelect: removePhoto }] : []),
             { label: 'Вийти з акаунту', onSelect: onLogout },
             { label: 'Видалити акаунт', onSelect: () => setDialog('delete'), danger: true, divider: true },
           ]} />
         </div>
       </header>
 
-      <section className="stats">
-        <div className="stat card"><span className="stat__value">{s.totalGames}</span><span className="stat__label">ігор у бібліотеці</span></div>
-        <div className="stat card"><span className="stat__value">{s.completionRate}%</span><span className="stat__label">пройдено</span></div>
-        <div className="stat card"><span className="stat__value">{s.reviewsCount}</span><span className="stat__label">рецензій</span></div>
-        <div className="stat card"><span className="stat__value">★ {s.averageGivenRating ?? '—'}</span><span className="stat__label">середня оцінка</span></div>
-        <div className="stat card"><span className="stat__value">{s.wishlistCount}</span><span className="stat__label">у Wishlist</span></div>
-      </section>
+      <ProfileStats stats={s} reviews={reviews.data} />
 
       <section className="card status-breakdown">
         <h2 className="section-title">За статусами</h2>
@@ -198,10 +273,13 @@ export default function ProfilePage() {
         </ul>
       </section>
 
-      <MyReviews count={s.reviewsCount} />
+      <MyReviews list={reviews} />
 
       <Modal open={dialog === 'edit'} title="Редагувати профіль" onClose={closeDialog}>
         <EditProfileForm user={user} onDone={closeDialog} />
+      </Modal>
+      <Modal open={dialog === 'avatar' && Boolean(newAvatar)} title="Нове фото профілю" onClose={closeDialog}>
+        <AvatarPreview image={newAvatar} onDone={closeDialog} />
       </Modal>
       <Modal open={dialog === 'delete'} title="Видалити акаунт?" onClose={closeDialog}>
         <DeleteAccountForm onCancel={closeDialog} />

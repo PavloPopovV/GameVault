@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
 import ReviewForm from '../components/ReviewForm.jsx';
+import Avatar from '../components/Avatar.jsx';
 import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate, pluralUk } from '../utils/constants.js';
@@ -135,7 +136,7 @@ export default function GamePage() {
         {reviews.data?.map((r) => (
           <article key={r.id} className={`review card ${r.author.id === user?.id ? 'review--mine' : ''}`}>
             <header className="review__head">
-              <span className="avatar" aria-hidden="true">{r.author.username[0].toUpperCase()}</span>
+              <Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} />
               <strong>{r.author.username}</strong>
               <span className="muted">· {formatDate(r.createdAt)}</span>
               <span className="rating review__rating">★ {r.rating}</span>
