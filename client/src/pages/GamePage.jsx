@@ -79,12 +79,14 @@ export default function GamePage() {
         <GameCover title={g.title} coverUrl={g.coverUrl} size="lg" decorative={false} />
         <div className="game-hero__info">
           <h1 className="game-hero__title">{g.title}</h1>
-          <p className="muted">{[g.releaseYear, g.developer].filter(Boolean).join(' · ')}</p>
+          <p className="game-hero__meta">{[g.releaseYear, g.developer].filter(Boolean).join(' · ')}</p>
           <div className="chips">{g.genres.map((x) => <span key={x} className="chip chip--static">{x}</span>)}</div>
-          <p className="game-hero__platforms"><span className="muted">Платформи:</span> {g.platforms.join(' · ')}</p>
+          <p className="game-hero__platforms">Платформи:{' '}
+            {g.platforms.map((p, i) => <span key={p}>{i > 0 && ' · '}<span className="game-hero__platform">{p}</span></span>)}
+          </p>
           <div className="game-hero__rating">
             <span className="rating rating--lg">★ {g.averageRating ?? '—'}</span>
-            <span className="muted">середня оцінка · {g.reviewsCount} {pluralUk(g.reviewsCount, ['рецензія', 'рецензії', 'рецензій'])}</span>
+            <span className="game-hero__rating-label">середня оцінка · {g.reviewsCount} {pluralUk(g.reviewsCount, ['рецензія', 'рецензії', 'рецензій'])}</span>
           </div>
 
           <div className="game-hero__actions">
@@ -96,7 +98,7 @@ export default function GamePage() {
               <>
                 <Select className="select--status" value={me.libraryStatus} options={STATUSES} onChange={onStatus}
                   label="Статус гри" renderValue={(o) => `Статус: ${o.label}`} />
-                <button type="button" className="btn btn--ghost" onClick={onRemove}>Прибрати з бібліотеки</button>
+                <button type="button" className="btn btn--ghost game-hero__remove" onClick={onRemove}>Прибрати з бібліотеки</button>
               </>
             )}
             <button type="button" className={`btn ${me?.inWishlist ? 'btn--secondary' : 'btn--outline'}`} onClick={onWishlist} aria-pressed={Boolean(me?.inWishlist)}>

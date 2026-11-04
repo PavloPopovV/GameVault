@@ -244,24 +244,14 @@ p { margin: 0; }
 @media (max-width: $bp-sm) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
 
 .game-card {
-  position: relative; min-width: 0; border-radius: var(--radius); background: var(--surface-2);
-  transition: transform 0.2s var(--ease-out);
-  &:hover { transform: translateY(-3px); .game-card__media .cover { transform: scale(1.04); } }
+  position: relative; min-width: 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px;
+  display: flex; flex-direction: column; gap: 10px; transition: transform 0.15s, border-color 0.15s;
+  &:hover { transform: translateY(-2px); border-color: var(--border-hover); }
 }
-.game-card__media {
-  display: block; border-radius: var(--radius); overflow: hidden;
-  .cover { border-radius: 0; transition: transform 0.4s var(--ease-out); }
-}
-/* панель «рідкого скла» поверх нижньої частини обкладинки */
-.game-card__panel {
-  position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 10px 10px 10px 12px; border-radius: 12px;
-  display: flex; flex-direction: column; gap: 2px;
-}
-.game-card__title {
-  font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
-}
-.game-card__meta { font-size: 12px; color: rgba(255, 255, 255, 0.72); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 6px; }
+.game-card__link { display: flex; flex-direction: column; gap: 10px; }
+.game-card__title { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.game-card__meta { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; flex-wrap: wrap; }
 .game-card__footer--actions {
   flex-wrap: nowrap;
@@ -286,6 +276,9 @@ p { margin: 0; }
 .game-hero__info { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .game-hero__title { font-size: 38px; font-weight: 800; letter-spacing: -0.02em; @media (max-width: $bp-sm) { font-size: 28px; } }
 .game-hero__rating { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.game-hero__meta, .game-hero__platforms, .game-hero__rating-label { color: #fff; }
+.game-hero__platform { color: var(--accent); font-weight: 600; }
+.game-hero__remove { color: #fff; }
 .game-hero__actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .game-hero__desc { margin-top: 12px; h2 { font-size: 16px; margin-bottom: 8px; } p { color: var(--text-soft); max-width: 70ch; } }
 .reviews { display: flex; flex-direction: column; gap: 14px; }
@@ -482,7 +475,10 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 }
 .liquid-refraction .liquid { backdrop-filter: url(#liquid-glass) blur(1.5px) saturate(180%); }
 .header.liquid { border-width: 0 0 1px; background: rgba(0, 0, 0, 0.35); box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06); &::after { display: none; } }
-.dropdown__menu.liquid, .menu__list.liquid { background: rgba(22, 22, 24, 0.62); }
+/* меню й випадаючі списки — скляні кромки, але щільний фон, щоб текст читався поверх будь-чого */
+.dropdown__menu.liquid, .menu__list.liquid { background: rgba(24, 24, 27, 0.97); }
+.game-card.liquid { background: rgba(18, 18, 20, 0.5); }
+.game-card.liquid:hover { border-color: rgba(255, 255, 255, 0.24); }
 .quest-log.liquid { background: radial-gradient(120% 140% at 100% 0%, rgba(242, 96, 12, 0.12), transparent 55%), rgba(18, 18, 20, 0.32); }
 .review-card.liquid { position: relative; background: rgba(18, 18, 20, 0.34); }
 .review-card--mine.liquid { border-color: var(--accent-line); }
