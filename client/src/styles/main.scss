@@ -255,10 +255,10 @@ p { margin: 0; }
 /* як у картках статистики: низ обкладинки тане в чорний з розмиттям, а поверх — прозора скляна плашка з інфою */
 .game-card__media { position: relative; }
 .game-card__media::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 55%; pointer-events: none;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 40%, transparent 100%);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  -webkit-mask-image: linear-gradient(to top, #000 50%, transparent); mask-image: linear-gradient(to top, #000 50%, transparent);
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 75%; pointer-events: none;
+  background: linear-gradient(to top, #000 0%, #000 28%, rgba(0, 0, 0, 0.85) 45%, rgba(0, 0, 0, 0.45) 70%, transparent 100%);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to top, #000 60%, transparent); mask-image: linear-gradient(to top, #000 60%, transparent);
 }
 .game-card__panel {
   position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 10px 10px 10px 12px; border-radius: 12px;
