@@ -314,3 +314,21 @@ describe('GV-17: керування каталогом (адмін)', () => {
     expect((await api('get', `/games/${created.body.id}`)).status).toBe(404);
   });
 });
+
+describe('GV-27: Wishlist і бібліотека не перетинаються', () => {
+  it('гру з бібліотеки не можна додати у Wishlist (409); додавання в бібліотеку прибирає гру з Wishlist', async () => {
+    const auth = { Authorization: `Bearer ${await registerUser('wishlist_guard')}` };
+    // у Wishlist → у бібліотеку: з Wishlist гра зникає
+    expect((await api('post', '/wishlist').set(auth).send({ gameId })).status).toBe(201);
+    expect((await api('post', '/library').set(auth).send({ gameId, status: 'PLAYING' })).status).toBe(201);
+    expect((await api('get', '/wishlist').set(auth)).body).toHaveLength(0);
+    expect((await api('get', `/games/${gameId}`).set(auth)).body.me).toMatchObject({
+      libraryStatus: 'PLAYING',
+      inWishlist: false,
+    });
+
+    const again = await api('post', '/wishlist').set(auth).send({ gameId });
+    expect(again.status).toBe(409);
+    expect(again.body.message).toMatch(/бібліотеці/);
+  });
+});

@@ -29,3 +29,11 @@ export function applyStatusChange(entry, nextStatus, now = new Date()) {
   }
   return { status: nextStatus, completedAt: null };
 }
+
+/**
+ * GV-27: Wishlist — для ігор, яких ще немає в бібліотеці.
+ * libraryEntry — запис бібліотеки цього користувача для гри (або null/undefined).
+ */
+export function canAddToWishlist(libraryEntry) {
+  return !libraryEntry;
+}

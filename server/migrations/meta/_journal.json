@@ -36,6 +36,13 @@
       "when": 1793812084483,
       "tag": "0004_add_review_votes",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793820473062,
+      "tag": "0005_wishlist_excludes_library",
+      "breakpoints": true
     }
   ]
 }
