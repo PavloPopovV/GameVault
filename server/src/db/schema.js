@@ -161,6 +161,25 @@ export const reviews = pgTable(
 );
 
 // ---- relations (для зручних запитів із join) ----
+// Оцінки рецензій іншими користувачами: 1 = 👍, -1 = 👎 (один голос від людини на рецензію)
+export const reviewVotes = pgTable(
+  'review_votes',
+  {
+    reviewId: uuid('review_id')
+      .notNull()
+      .references(() => reviews.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    value: smallint('value').notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.reviewId, t.userId] }),
+    check('review_votes_value_check', sql`${t.value} IN (-1, 1)`),
+  ],
+);
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, { fields: [users.id], references: [profiles.userId] }),
   library: many(libraryEntries),

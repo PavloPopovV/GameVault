@@ -7,6 +7,7 @@ import { badRequest, conflict, forbidden, notFound } from '../utils/errors.js';
 import { isDemoAccount } from '../config/demo.js';
 import { avatarPath, parseAvatarDataUrl } from '../domain/avatar.js';
 import { publicUser } from './auth.service.js';
+import { attachVotes } from './reviews.service.js';
 
 export async function getMe(userId) {
   const user = await db.query.users.findFirst({
@@ -65,8 +66,8 @@ export async function updateProfile(userId, { username, bio, email, currentPassw
 }
 
 /** Рецензії користувача з короткою інформацією про гру — для профілю. */
-export function listMyReviews(userId) {
-  return db
+export async function listMyReviews(userId) {
+  const rows = await db
     .select({
       id: reviews.id,
       rating: reviews.rating,
@@ -79,6 +80,7 @@ export function listMyReviews(userId) {
     .innerJoin(games, eq(games.id, reviews.gameId))
     .where(eq(reviews.userId, userId))
     .orderBy(desc(reviews.updatedAt));
+  return attachVotes(rows);
 }
 
 /** Видалення акаунта з підтвердженням паролем. Бібліотека, Wishlist, рецензії й профіль видаляються каскадно. */

@@ -71,6 +71,10 @@ export const updateReviewSchema = z
   .object({ rating: rating.optional(), text: reviewText.optional() })
   .refine((o) => o.rating !== undefined || o.text !== undefined, 'Немає полів для оновлення');
 
+export const voteSchema = z.object({
+  value: z.union([z.literal(1), z.literal(-1), z.literal(0)], { message: 'Голос має бути 1, -1 або 0' }),
+});
+
 export const avatarSchema = z.object({ image: z.string().max(300_000, 'Фото завелике') });
 
 export const deleteAccountSchema = z.object({
