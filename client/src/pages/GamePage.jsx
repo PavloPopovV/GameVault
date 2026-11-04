@@ -59,6 +59,7 @@ export default function GamePage() {
     try { await api.updateReview(myReview.id, body); await afterReview('Рецензію оновлено'); } catch (err) { toast.error(err.message); }
   };
   const deleteReview = async () => {
+    if (!window.confirm('Видалити вашу рецензію? Цю дію не можна скасувати.')) return;
     try { await api.deleteReview(myReview.id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); }
   };
 
@@ -67,7 +68,7 @@ export default function GamePage() {
       <nav className="breadcrumbs"><Link to="/">Каталог</Link> / <span>{g.title}</span></nav>
 
       <section className="game-hero">
-        <GameCover title={g.title} coverUrl={g.coverUrl} size="lg" />
+        <GameCover title={g.title} coverUrl={g.coverUrl} size="lg" decorative={false} />
         <div className="game-hero__info">
           <h1 className="game-hero__title">{g.title}</h1>
           <p className="muted">{[g.releaseYear, g.developer].filter(Boolean).join(' · ')}</p>
