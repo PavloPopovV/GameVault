@@ -8,6 +8,8 @@ import { games } from '../db/schema.js';
 
 const KEY = process.env.RAWG_API_KEY;
 const overwriteAll = process.argv.includes('--all');
+// --optional: для збірки на Render — без ключа просто пропускаємо, а не падаємо
+const optional = process.argv.includes('--optional');
 
 export async function findRawgCover(title, key = KEY, fetchImpl = fetch) {
   const url = new URL('https://api.rawg.io/api/games');
@@ -20,6 +22,10 @@ export async function findRawgCover(title, key = KEY, fetchImpl = fetch) {
 
 async function main() {
   if (!KEY) {
+    if (optional) {
+      console.log('RAWG_API_KEY не задано — імпорт обкладинок пропущено.');
+      return;
+    }
     console.error('Не задано RAWG_API_KEY у .env. Отримати ключ: https://rawg.io/apidocs');
     process.exitCode = 1;
     return;
