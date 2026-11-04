@@ -62,9 +62,10 @@ export default function CatalogPage() {
       toast.success(`«${game.title}» додано в бібліотеку`);
     } catch (err) {
       if (err.status === 409) {
-        // Гра вже в бібліотеці (напр., додана в іншій вкладці) — підтягуємо актуальний статус
-        list.reload();
+        // Гра вже в бібліотеці (напр., додана в іншій вкладці) — оновлюємо лише цю картку, без перезавантаження сітки
         toast.info(`«${game.title}» вже є у вашій бібліотеці`);
+        const fresh = await api.game(game.slug).catch(() => null);
+        setAdded((s) => new Map(s).set(game.id, fresh?.me?.libraryStatus ?? 'UNKNOWN'));
       } else {
         toast.error(err.message);
       }
