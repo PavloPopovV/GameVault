@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
 import ReviewForm from '../components/ReviewForm.jsx';
+import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate, pluralUk } from '../utils/constants.js';
 
@@ -86,10 +87,8 @@ export default function GamePage() {
             )}
             {isAuthenticated && me?.libraryStatus && (
               <>
-                <label className="sr-only" htmlFor="status">Статус гри</label>
-                <select id="status" className="select select--status" value={me.libraryStatus} onChange={(e) => onStatus(e.target.value)}>
-                  {STATUSES.map((s) => <option key={s.value} value={s.value}>Статус: {s.label}</option>)}
-                </select>
+                <Select className="select--status" value={me.libraryStatus} options={STATUSES} onChange={onStatus}
+                  label="Статус гри" renderValue={(o) => `Статус: ${o.label}`} />
                 <button type="button" className="btn btn--ghost" onClick={onRemove}>Прибрати з бібліотеки</button>
               </>
             )}

@@ -4,6 +4,7 @@ import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import Select from '../components/Select.jsx';
 import GameCard from '../components/GameCard.jsx';
 import Pagination from '../components/Pagination.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
@@ -95,9 +96,7 @@ export default function CatalogPage() {
           </div>
           <div className="toolbar__actions">
             <button type="button" className="btn btn--secondary btn--sm filters__toggle" onClick={() => setFiltersOpen(true)}>Фільтри</button>
-            <select className="select select--sm" value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Сортування">
-              {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
+            <Select size="sm" value={sort} options={SORTS} onChange={(v) => update({ sort: v })} label="Сортування" />
           </div>
         </div>
 
