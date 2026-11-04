@@ -10,6 +10,8 @@ import Pagination from '../components/Pagination.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { pluralUk } from '../utils/constants.js';
 
+const PAGE_SIZE = 8; // карток на сторінці каталогу (2 ряди по 4)
+
 const SORTS = [
   { value: 'rating', label: 'За рейтингом' },
   { value: 'newest', label: 'Спершу нові' },
@@ -30,7 +32,7 @@ export default function CatalogPage() {
   const page = Number(params.get('page')) || 1;
 
   const taxonomy = useAsync(() => Promise.all([api.genres(), api.platforms()]), []);
-  const list = useAsync(() => api.games({ q, genre, platform, sort, page, limit: 12 }), [q, genre, platform, sort, page]);
+  const list = useAsync(() => api.games({ q, genre, platform, sort, page, limit: PAGE_SIZE }), [q, genre, platform, sort, page]);
 
   const update = (patch) => {
     const next = new URLSearchParams(params);
