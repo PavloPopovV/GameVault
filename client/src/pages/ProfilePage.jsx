@@ -228,7 +228,7 @@ function MyReviews({ list }) {
       {list.data?.length > 0 && (
         <div className="reviews">
           {list.data.map((r) => (
-            <ReviewCard key={r.id} review={r} clamp
+            <ReviewCard key={r.id} review={r} clamp ambient={r.game.coverUrl}
               media={<Link to={`/games/${r.game.slug}`} tabIndex={-1} aria-hidden="true"><GameCover title={r.game.title} coverUrl={r.game.coverUrl} size="sm" /></Link>}
               title={<Link to={`/games/${r.game.slug}`} className="review-card__link">{r.game.title}</Link>}
               onUpdate={(body) => run(() => api.updateReview(r.id, body), 'Рецензію оновлено')}

@@ -444,3 +444,33 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 .quest__count { font-size: 16px; font-weight: 800; letter-spacing: 0.02em; text-align: right; color: var(--tone); font-variant-numeric: tabular-nums; }
 .quest--empty { .quest__count, .quest__label { opacity: 0.55; } .quest__icon { filter: grayscale(1); opacity: 0.6; } }
 @media (prefers-reduced-motion: reduce) { .quest__bar i.is-on { animation: none; } .quest__icon { transition: none; } }
+
+/* ======================================================================
+   Скло (експеримент). Щоб відкотити — прибрати цей блок і класи glass/Ambient.
+   На чистому чорному склу нічого розмивати, тому під сторінкою — м'які кольорові плями.
+   ====================================================================== */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42vw 42vw at 8% -5%, rgba(242, 96, 12, 0.16), transparent 70%),
+    radial-gradient(40vw 40vw at 100% 30%, rgba(45, 212, 191, 0.08), transparent 70%),
+    radial-gradient(45vw 45vw at 35% 105%, rgba(242, 96, 12, 0.09), transparent 70%);
+}
+.glass {
+  position: relative; isolation: isolate;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015));
+  border-color: rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+.game-card.glass:hover { border-color: rgba(255, 255, 255, 0.18); }
+.quest-log.glass { background: radial-gradient(120% 140% at 100% 0%, rgba(242, 96, 12, 0.14), transparent 55%), linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015)); }
+.review-card--mine.glass { border-color: var(--accent-line); }
+.ambient { position: absolute; inset: 0; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.ambient__img {
+  position: absolute; inset: -30%; background-size: cover; background-position: center;
+  filter: blur(40px) saturate(1.5); opacity: 0.3; transition: opacity 0.3s;
+}
+.game-card:hover .ambient__img, .review-card:hover .ambient__img { opacity: 0.45; }
+/* Браузери без backdrop-filter — звичайний темний фон */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass { background: var(--surface); } }
