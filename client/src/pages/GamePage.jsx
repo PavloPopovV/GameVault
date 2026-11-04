@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
@@ -10,6 +11,7 @@ import PageBackdrop from '../components/PageBackdrop.jsx';
 import { heroUrl } from '../utils/hero.js';
 import Avatar from '../components/Avatar.jsx';
 import Select from '../components/Select.jsx';
+import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, pluralUk } from '../utils/constants.js';
 
@@ -18,10 +20,11 @@ export default function GamePage() {
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   const game = useAsync(() => api.game(slug), [slug, isAuthenticated]);
   const gameId = game.data?.id;
-  const reviews = useAsync(() => (gameId ? api.reviews(gameId) : Promise.resolve([])), [gameId]);
+  const reviews = useAsync(() => (gameId ? api.reviews(gameId) : Promise.resolve([])), [gameId, isAuthenticated]);
 
   if (game.loading && !game.data) return <Spinner />;
   if (game.error) {
@@ -49,11 +52,9 @@ export default function GamePage() {
     () => (me?.libraryStatus ? api.setStatus(g.id, status) : api.addToLibrary(g.id, status)),
     me?.libraryStatus ? 'Статус оновлено' : 'Гру додано в бібліотеку',
   );
-  const onRemove = () => {
-    // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-21)
-    if (me?.reviewId && !window.confirm('Разом з грою буде видалено вашу рецензію. Продовжити?')) return;
-    run(async () => { await api.removeFromLibrary(g.id); if (me?.reviewId) await reviews.reload(); }, 'Гру прибрано з бібліотеки');
-  };
+  const doRemove = () => run(async () => { await api.removeFromLibrary(g.id); if (me?.reviewId) await reviews.reload(); }, 'Гру прибрано з бібліотеки');
+  // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-21) — питаємо в модалці
+  const onRemove = () => (me?.reviewId ? setConfirmRemove(true) : doRemove());
   const onWishlist = () => (isAuthenticated
     ? run(() => (me.inWishlist ? api.removeFromWishlist(g.id) : api.addToWishlist(g.id)), me.inWishlist ? 'Прибрано з Wishlist' : 'Додано у Wishlist')
     : requireLogin());
@@ -146,6 +147,10 @@ export default function GamePage() {
           );
         })}
       </section>
+      <ConfirmDialog open={confirmRemove} title="Прибрати гру з бібліотеки?" confirmLabel="Прибрати" danger
+        onConfirm={doRemove} onClose={() => setConfirmRemove(false)}>
+        Разом з грою буде видалено вашу рецензію на неї. Цю дію <b>не можна скасувати</b>.
+      </ConfirmDialog>
     </div>
   );
 }
