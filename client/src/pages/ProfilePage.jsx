@@ -148,7 +148,7 @@ function AvatarPreview({ image, onDone }) {
 }
 
 // Картка статистики: фон — обкладинка тематичної гри з бібліотеки, під текстом — акцентне розмиття
-function StatCard({ value, label, cover, to }) {
+function StatCard({ value, label, cover, to, scrollTo }) {
   const content = (
     <>
       {cover ? <img className="stat__bg" src={cover} alt="" aria-hidden="true" loading="lazy" /> : <span className="stat__bg stat__bg--empty" aria-hidden="true" />}
@@ -159,7 +159,13 @@ function StatCard({ value, label, cover, to }) {
       </span>
     </>
   );
-  return to ? <Link to={to} className="stat card">{content}</Link> : <div className="stat card">{content}</div>;
+  if (to) return <Link to={to} className="stat card">{content}</Link>;
+  // Картки без окремої сторінки ведуть до секції на цій же сторінці (плавна прокрутка)
+  const onClick = (e) => {
+    e.preventDefault();
+    document.getElementById(scrollTo)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  return <a href={`#${scrollTo}`} className="stat card" onClick={onClick}>{content}</a>;
 }
 
 /**
@@ -197,8 +203,8 @@ function ProfileStats({ stats: s, reviews }) {
     <section className="stats">
       <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={covers[0]} />
       <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED" cover={covers[1]} />
-      <StatCard value={s.reviewsCount} label="рецензій" cover={covers[2]} />
-      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={covers[3]} />
+      <StatCard value={s.reviewsCount} label="рецензій" cover={covers[2]} scrollTo="my-reviews" />
+      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={covers[3]} scrollTo="my-reviews" />
       <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={covers[4]} />
     </section>
   );
@@ -211,7 +217,7 @@ function MyReviews({ list }) {
     try { await fn(); toast.success(success); await list.reload(); } catch (err) { toast.error(err.message); throw err; }
   };
   return (
-    <section className="profile__reviews">
+    <section className="profile__reviews" id="my-reviews">
       <h2 className="section-title">Мої рецензії{list.data?.length ? <span className="muted"> · {list.data.length}</span> : null}</h2>
       {list.loading && !list.data && <Spinner />}
       {list.error && <ErrorState error={list.error} onRetry={list.reload} />}

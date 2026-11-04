@@ -311,7 +311,7 @@ p { margin: 0; }
 .profile__bio { color: var(--text-soft); max-width: 60ch; white-space: pre-line; }
 .profile__bio--empty { color: var(--muted); font-style: italic; }
 .profile__meta { color: var(--muted); font-size: 14px; }
-.profile__reviews { display: flex; flex-direction: column; }
+.profile__reviews { display: flex; flex-direction: column; scroll-margin-top: 92px; }
 
 /* ---------- Modal ---------- */
 .modal {
