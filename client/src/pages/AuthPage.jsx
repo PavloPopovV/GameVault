@@ -60,7 +60,7 @@ export default function AuthPage({ mode }) {
       <div className="auth__card card">
         <div className="auth__brand">
           <img src="/favicon.svg" alt="" width="40" height="40" />
-          <h1>GameVault</h1>
+          <h1 className="brand-name">GameVault</h1>
         </div>
         <p className="auth__lead">Усі твої ігри — в одній бібліотеці.</p>
         <div className="tabs" role="tablist">

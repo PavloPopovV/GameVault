@@ -27,7 +27,8 @@ p { margin: 0; }
 /* ---------- Header ---------- */
 .header { position: sticky; top: 0; z-index: 20; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
 .header__inner { display: flex; align-items: center; gap: 24px; height: 68px; }
-.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; flex-shrink: 0; }
+.logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand-name { font-family: var(--font-logo); font-weight: 400; font-size: 15px; letter-spacing: 0; line-height: 1; padding-top: 2px; }
 .search { flex: 1; max-width: 420px; }
 .search__input {
   width: 100%; height: var(--control-h-sm); padding: 0 14px 0 38px; border-radius: 10px; border: 1px solid var(--border);
@@ -180,7 +181,7 @@ p { margin: 0; }
 /* ---------- Auth ---------- */
 .auth { display: flex; justify-content: center; padding: 24px 0; }
 .auth__card { width: 100%; max-width: 440px; padding: 36px; display: flex; flex-direction: column; gap: 20px; @media (max-width: $bp-sm) { padding: 24px 20px; } }
-.auth__brand { display: flex; align-items: center; gap: 12px; h1 { font-size: 24px; font-weight: 800; } }
+.auth__brand { display: flex; align-items: center; gap: 14px; h1 { font-size: 20px; } }
 .auth__lead { color: var(--muted); margin-top: -8px; }
 .auth__switch { text-align: center; color: var(--muted); font-size: 14px; a { color: var(--accent); font-weight: 600; } }
 .tabs { display: flex; padding: 4px; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; }
