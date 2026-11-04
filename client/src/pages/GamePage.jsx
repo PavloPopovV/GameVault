@@ -50,7 +50,7 @@ export default function GamePage() {
 
   const onStatus = (status) => run(
     () => (me?.libraryStatus ? api.setStatus(g.id, status) : api.addToLibrary(g.id, status)),
-    me?.libraryStatus ? 'Статус оновлено' : 'Гру додано в бібліотеку',
+    me?.libraryStatus ? 'Статус оновлено' : me?.inWishlist ? 'Гру перенесено з Wishlist у бібліотеку' : 'Гру додано в бібліотеку',
   );
   const doRemove = () => run(async () => { await api.removeFromLibrary(g.id); if (me?.reviewId) await reviews.reload(); }, 'Гру прибрано з бібліотеки');
   // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-21) — питаємо в модалці
@@ -104,9 +104,12 @@ export default function GamePage() {
                 <button type="button" className="btn btn--ghost game-hero__remove" onClick={onRemove}>Прибрати з бібліотеки</button>
               </>
             )}
-            <button type="button" className={`btn ${me?.inWishlist ? 'btn--secondary' : 'btn--outline'}`} onClick={onWishlist} aria-pressed={Boolean(me?.inWishlist)}>
-              {me?.inWishlist ? '♥ У Wishlist' : '♡ У Wishlist'}
-            </button>
+            {/* GV-27: Wishlist — лише для ігор поза бібліотекою; додавання в бібліотеку прибирає гру з Wishlist на сервері */}
+            {!me?.libraryStatus && (
+              <button type="button" className={`btn ${me?.inWishlist ? 'btn--secondary' : 'btn--outline'}`} onClick={onWishlist} aria-pressed={Boolean(me?.inWishlist)}>
+                {me?.inWishlist ? '♥ У Wishlist' : '♡ У Wishlist'}
+              </button>
+            )}
           </div>
 
           {g.description && (
