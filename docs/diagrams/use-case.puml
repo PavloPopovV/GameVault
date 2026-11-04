@@ -1,0 +1,60 @@
+@startuml
+left to right direction
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F4F6FA
+  BorderColor #3B4A6B
+  ArrowColor #3B4A6B
+}
+skinparam rectangle {
+  BorderColor #3B4A6B
+  FontSize 16
+}
+skinparam actor {
+  BorderColor #3B4A6B
+  BackgroundColor #FFFFFF
+}
+skinparam ArrowColor #3B4A6B
+
+title GameVault — діаграма прецедентів (Use Case)
+
+actor "Гість" as Guest
+actor "Користувач" as User
+actor "Адміністратор" as Admin
+
+User -up-|> Guest
+Admin -up-|> User
+
+rectangle "GameVault" {
+  usecase "Зареєструватися" as UC1
+  usecase "Авторизуватися" as UC2
+  usecase "Переглядати каталог\nі шукати ігри" as UC3
+  usecase "Переглянути сторінку гри" as UC4
+  usecase "Керувати бібліотекою\n(статуси проходження)" as UC5
+  usecase "Додати гру у Wishlist" as UC6
+  usecase "Написати рецензію\nз оцінкою 1–10" as UC7
+  usecase "Переглянути профіль\nі статистику" as UC8
+  usecase "Керувати каталогом ігор" as UC9
+  usecase "Модерувати рецензії" as UC10
+}
+
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+Guest --> UC4
+User --> UC5
+User --> UC7
+User --> UC8
+Admin --> UC9
+Admin --> UC10
+
+UC5 ..> UC2 : <<include>>
+UC7 ..> UC2 : <<include>>
+UC8 ..> UC2 : <<include>>
+UC9 ..> UC2 : <<include>>
+UC6 .> UC4 : <<extend>>\n[користувач\nавторизований]
+
+@enduml

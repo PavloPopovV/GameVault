@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="883px" preserveAspectRatio="none" style="width:963px;height:883px;" version="1.1" viewBox="0 0 963 883" width="963px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="338" x="324" y="12.9951">GameVault — діаграма прецедентів (Use Case)</text><!--cluster GameVault--><rect fill="#FFFFFF" height="794" style="stroke: #3B4A6B; stroke-width: 1.5;" width="551" x="401" y="40.2969"/><text fill="#000000" font-family="DejaVu Sans" font-size="16" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="95" x="629" y="57.1484">GameVault</text><ellipse cx="537.0262" cy="800.3021" fill="#F4F6FA" rx="78.0262" ry="18.0052" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="126" x="474.0262" y="804.9505">Зареєструватися</text><ellipse cx="861.7002" cy="432.1369" fill="#F4F6FA" rx="74.7002" ry="17.34" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="118" x="802.7002" y="436.7854">Авторизуватися</text><ellipse cx="537.0976" cy="101.5336" fill="#F4F6FA" rx="106.5976" ry="24.2367" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="159" x="457.5976" y="100.7139">Переглядати каталог</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="93" x="490.5976" y="117.0108">і шукати ігри</text><ellipse cx="536.8679" cy="599.4705" fill="#F4F6FA" rx="106.3679" ry="23.6736" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="190" x="441.8679" y="604.1189">Переглянути сторінку гри</text><ellipse cx="536.9159" cy="345.18" fill="#F4F6FA" rx="119.9159" ry="26.3832" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="162" x="455.9159" y="341.1148">Керувати бібліотекою</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="173" x="450.4159" y="357.4116">(статуси проходження)</text><ellipse cx="536.7915" cy="727.4552" fill="#F4F6FA" rx="88.7915" ry="20.1583" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="151" x="461.2915" y="732.1036">Додати гру у Wishlist</text><ellipse cx="536.8402" cy="432.1416" fill="#F4F6FA" rx="98.8402" ry="24.8447" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="143" x="465.3402" y="430.3919">Написати рецензію</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="108" x="482.8402" y="446.6888">з оцінкою 1-10</text><ellipse cx="536.9124" cy="516.4956" fill="#F4F6FA" rx="106.4124" ry="24.1987" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="159" x="457.4124" y="515.7353">Переглянути профіль</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="91" x="491.4124" y="532.0321">і статистику</text><ellipse cx="537.2042" cy="260.2377" fill="#F4F6FA" rx="102.7042" ry="22.9408" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="182" x="446.2042" y="264.8862">Керувати каталогом ігор</text><ellipse cx="537.0567" cy="181.3082" fill="#F4F6FA" rx="90.5567" ry="20.5113" style="stroke: #3B4A6B; stroke-width: 1.5;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="155" x="459.5567" y="185.9567">Модерувати рецензії</text><!--entity Guest--><ellipse cx="24" cy="569.7969" fill="#FFFFFF" rx="8" ry="8" style="stroke: #3B4A6B; stroke-width: 2.0;"/><path d="M24,577.7969 L24,604.7969 M11,585.7969 L37,585.7969 M24,604.7969 L11,619.7969 M24,604.7969 L37,619.7969 " fill="none" style="stroke: #3B4A6B; stroke-width: 2.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="36" x="6" y="635.792">Гість</text><!--entity User--><ellipse cx="145.5" cy="402.7969" fill="#FFFFFF" rx="8" ry="8" style="stroke: #3B4A6B; stroke-width: 2.0;"/><path d="M145.5,410.7969 L145.5,437.7969 M132.5,418.7969 L158.5,418.7969 M145.5,437.7969 L132.5,452.7969 M145.5,437.7969 L158.5,452.7969 " fill="none" style="stroke: #3B4A6B; stroke-width: 2.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="85" x="103" y="468.792">Користувач</text><!--entity Admin--><ellipse cx="301.5" cy="230.7969" fill="#FFFFFF" rx="8" ry="8" style="stroke: #3B4A6B; stroke-width: 2.0;"/><path d="M301.5,238.7969 L301.5,265.7969 M288.5,246.7969 L314.5,246.7969 M301.5,265.7969 L288.5,280.7969 M301.5,265.7969 L314.5,280.7969 " fill="none" style="stroke: #3B4A6B; stroke-width: 2.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="105" x="249" y="296.792">Адміністратор</text><!--link Guest to User--><path d="M53.87,558.9469 C72.76,532.5569 97.32,498.2369 116.11,471.9769 " fill="none" id="Guest-User" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="none" points="59.45,563.1769,42.12,575.3669,48.07,555.0269,59.45,563.1769" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link User to Admin--><path d="M182.6,376.1569 C193.29,361.0169 205.5,345.0369 218,331.2969 C227.79,320.5369 239.16,309.8169 250.26,300.1069 " fill="none" id="User-Admin" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="none" points="188.32,380.1869,171.23,392.7269,176.77,372.2769,188.32,380.1869" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Guest to UC1--><path d="M42.18,608.3069 C93.94,635.1769 253.43,715.8569 393,764.2969 C418.96,773.3069 448.29,781.0869 473.61,787.0969 " fill="none" id="Guest-UC1" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="478.61,788.2669,470.7615,782.317,473.7422,787.1249,468.9343,790.1055,478.61,788.2669" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Guest to UC2--><path d="M25.01,638.8469 C27.32,714.2869 44.18,871.2969 144.5,871.2969 C144.5,871.2969 144.5,871.2969 538,871.2969 C593.26,871.2969 614.68,870.8269 657,835.2969 C783.95,728.6969 840.03,523.1869 855.7,454.9369 " fill="none" id="Guest-UC2" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="856.84,449.8869,850.9339,457.7684,855.7251,454.761,858.7325,459.5522,856.84,449.8869" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Guest to UC3--><path d="M34.04,559.7869 C45.66,513.5169 68.56,435.5269 103,375.2969 C152.77,288.2569 168.03,262.4469 249,203.2969 C309.12,159.3769 389.92,132.9169 450.47,117.9969 " fill="none" id="Guest-UC3" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="455.52,116.7669,445.8281,115.0154,450.6626,117.9526,447.7254,122.7871,455.52,116.7669" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Guest to UC4--><path d="M42,599.2969 C100.72,599.2969 298.3,599.2969 425.08,599.2969 " fill="none" id="Guest-UC4" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="430.31,599.2969,421.31,595.2969,425.31,599.2969,421.31,603.2969,430.31,599.2969" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link User to UC5--><path d="M188.11,415.9069 C197.82,412.4269 208.2,408.9969 218,406.2969 C288.5,386.8469 369.47,371.4169 432.06,360.9369 " fill="none" id="User-UC5" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="437.29,360.0669,427.7526,357.6098,432.3588,360.8935,429.0751,365.4997,437.29,360.0669" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link User to UC7--><path d="M188.18,432.2969 C246.08,432.2969 352.74,432.2969 432.74,432.2969 " fill="none" id="User-UC7" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="437.97,432.2969,428.97,428.2969,432.97,432.2969,428.97,436.2969,437.97,432.2969" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link User to UC8--><path d="M188.18,441.2869 C251.46,454.9369 372.97,481.1369 454.28,498.6769 " fill="none" id="User-UC8" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="459.58,499.8169,451.626,494.0088,454.6925,498.7624,449.9388,501.8289,459.58,499.8169" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Admin to UC9--><path d="M354.03,260.2969 C376.19,260.2969 402.97,260.2969 429.08,260.2969 " fill="none" id="Admin-UC9" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="434.29,260.2969,425.29,256.2969,429.29,260.2969,425.29,264.2969,434.29,260.2969" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link Admin to UC10--><path d="M354.06,235.1669 C366.63,229.5269 380.17,223.8769 393,219.2969 C416.94,210.7569 443.75,203.1469 467.62,197.0169 " fill="none" id="Admin-UC10" style="stroke: #3B4A6B; stroke-width: 1.0;"/><polygon fill="#3B4A6B" points="472.66,195.7269,462.9527,194.0628,467.8135,196.9564,464.9199,201.8171,472.66,195.7269" style="stroke: #3B4A6B; stroke-width: 1.0;"/><!--link UC5 to UC2--><path d="M613.61,365.6969 C672.95,381.6969 754.08,403.5869 806.88,417.8369 " fill="none" id="UC5-UC2" style="stroke: #3B4A6B; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#3B4A6B" points="811.9,419.1869,804.2494,412.9847,807.0719,417.887,802.1696,420.7096,811.9,419.1869" style="stroke: #3B4A6B; stroke-width: 1.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="68" x="688" y="382.292">«include»</text><!--link UC7 to UC2--><path d="M636.07,432.2969 C682.82,432.2969 737.99,432.2969 781.93,432.2969 " fill="none" id="UC7-UC2" style="stroke: #3B4A6B; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#3B4A6B" points="786.96,432.2969,777.96,428.2969,781.96,432.2969,777.96,436.2969,786.96,432.2969" style="stroke: #3B4A6B; stroke-width: 1.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="68" x="688" y="428.292">«include»</text><!--link UC8 to UC2--><path d="M607.58,498.1769 C667.08,482.6769 751.5,460.6869 806.14,446.4569 " fill="none" id="UC8-UC2" style="stroke: #3B4A6B; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#3B4A6B" points="811,445.1869,801.2793,443.6034,806.1639,446.4565,803.3107,451.3411,811,445.1869" style="stroke: #3B4A6B; stroke-width: 1.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="68" x="688" y="456.292">«include»</text><!--link UC9 to UC2--><path d="M598.85,278.6369 C617.8,285.0369 638.55,292.7769 657,301.2969 C725,332.6869 796.97,383.8769 834.41,412.0769 " fill="none" id="UC9-UC2" style="stroke: #3B4A6B; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#3B4A6B" points="838.8,415.3969,834.0345,406.7777,834.812,412.3809,829.2089,413.1585,838.8,415.3969" style="stroke: #3B4A6B; stroke-width: 1.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="68" x="688" y="315.292">«include»</text><!--link UC6 to UC4--><path d="M537,707.2969 C537,686.1169 537,652.4769 537,628.3669 " fill="none" id="UC6-UC4" style="stroke: #3B4A6B; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#3B4A6B" points="537,623.0769,533,632.0769,537,628.0769,541,632.0769,537,623.0769" style="stroke: #3B4A6B; stroke-width: 1.0;"/><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="66" x="476" y="654.042">«extend»</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="88" x="465" y="670.3389">[користувач</text><text fill="#000000" font-family="DejaVu Sans" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="117" x="450.5" y="686.6357">авторизований]</text><!--
+@startuml
+left to right direction
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F4F6FA
+  BorderColor #3B4A6B
+  ArrowColor #3B4A6B
+}
+skinparam rectangle {
+  BorderColor #3B4A6B
+  FontSize 16
+}
+skinparam actor {
+  BorderColor #3B4A6B
+  BackgroundColor #FFFFFF
+}
+skinparam ArrowColor #3B4A6B
+
+title GameVault — діаграма прецедентів (Use Case)
+
+actor "Гість" as Guest
+actor "Користувач" as User
+actor "Адміністратор" as Admin
+
+User -up-|> Guest
+Admin -up-|> User
+
+rectangle "GameVault" {
+  usecase "Зареєструватися" as UC1
+  usecase "Авторизуватися" as UC2
+  usecase "Переглядати каталог\nі шукати ігри" as UC3
+  usecase "Переглянути сторінку гри" as UC4
+  usecase "Керувати бібліотекою\n(статуси проходження)" as UC5
+  usecase "Додати гру у Wishlist" as UC6
+  usecase "Написати рецензію\nз оцінкою 1-10" as UC7
+  usecase "Переглянути профіль\nі статистику" as UC8
+  usecase "Керувати каталогом ігор" as UC9
+  usecase "Модерувати рецензії" as UC10
+}
+
+Guest - -> UC1
+Guest - -> UC2
+Guest - -> UC3
+Guest - -> UC4
+User - -> UC5
+User - -> UC7
+User - -> UC8
+Admin - -> UC9
+Admin - -> UC10
+
+UC5 ..> UC2 : <<include>>
+UC7 ..> UC2 : <<include>>
+UC8 ..> UC2 : <<include>>
+UC9 ..> UC2 : <<include>>
+UC6 .> UC4 : <<extend>>\n[користувач\nавторизований]
+
+@enduml
+
+PlantUML version 1.2019.06(Fri May 24 20:10:25 EEST 2019)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 21.0.12.1+1-1-24.04.4-Ubuntu
+Operating System: Linux
+OS Version: 6.18.44-fc-v233
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

@@ -1,0 +1,100 @@
+@startuml
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #F4F6FA
+  BorderColor #3B4A6B
+  ArrowColor #3B4A6B
+  HeaderBackgroundColor #DDE3EE
+}
+hide circle
+title GameVault — діаграма класів (Class Diagram)
+
+enum Role {
+  USER
+  ADMIN
+}
+enum LibraryStatus {
+  WANT_TO_PLAY
+  PLAYING
+  COMPLETED
+  DROPPED
+}
+
+class User {
+  + id: UUID
+  + email: String
+  + username: String
+  - passwordHash: String
+  + role: Role
+  + createdAt: Date
+  --
+  + checkPassword(plain: String): Boolean
+}
+class Profile {
+  + id: UUID
+  + userId: UUID
+  + bio: String
+  + updatedAt: Date
+  --
+  + getStats(): ProfileStats
+}
+class Game {
+  + id: UUID
+  + title: String
+  + slug: String
+  + description: String
+  + releaseYear: Integer
+  + coverUrl: String
+  + developer: String
+  + createdAt: Date
+  --
+  + getAverageRating(): Float
+}
+class Genre {
+  + id: Integer
+  + name: String
+}
+class Platform {
+  + id: Integer
+  + name: String
+}
+class LibraryEntry {
+  + id: UUID
+  + userId: UUID
+  + gameId: UUID
+  + status: LibraryStatus
+  + completedAt: Date
+  + addedAt: Date
+  --
+  + changeStatus(next: LibraryStatus): void
+}
+class WishlistItem {
+  + id: UUID
+  + userId: UUID
+  + gameId: UUID
+  + addedAt: Date
+}
+class Review {
+  + id: UUID
+  + userId: UUID
+  + gameId: UUID
+  + rating: Integer  {1..10}
+  + text: String
+  + createdAt: Date
+  + updatedAt: Date
+}
+
+User "1" *-- "1" Profile : має >
+User "1" *-- "0..*" LibraryEntry : веде >
+User "1" *-- "0..*" WishlistItem : додає >
+User "1" *-- "0..*" Review : пише >
+Game "1" -- "0..*" LibraryEntry
+Game "1" -- "0..*" WishlistItem
+Game "1" -- "0..*" Review
+Game "*" -- "*" Genre : належить до >
+Game "*" -- "*" Platform : доступна на >
+User ..> Role
+LibraryEntry ..> LibraryStatus
+@enduml

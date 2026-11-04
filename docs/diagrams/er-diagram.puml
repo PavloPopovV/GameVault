@@ -1,0 +1,112 @@
+@startuml
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #F4F6FA
+  BorderColor #3B4A6B
+  ArrowColor #3B4A6B
+  HeaderBackgroundColor #DDE3EE
+}
+hide circle
+hide methods
+title GameVault — ER-діаграма (PostgreSQL)
+
+entity "users" as users {
+  * id : uuid <<PK>>
+  --
+  * email : varchar(255) <<UNIQUE>>
+  * username : varchar(32) <<UNIQUE>>
+  * password_hash : varchar(255)
+  * role : role = USER
+  * created_at : timestamp
+}
+entity "profiles" as profiles {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK, UNIQUE>>
+  bio : varchar(200)
+  * updated_at : timestamp
+}
+entity "games" as games {
+  * id : uuid <<PK>>
+  --
+  * title : varchar(150) <<UNIQUE>>
+  * slug : varchar(160) <<UNIQUE>>
+  description : text
+  release_year : int
+  cover_url : varchar(500)
+  developer : varchar(100)
+  * created_at : timestamp
+}
+entity "genres" as genres {
+  * id : serial <<PK>>
+  --
+  * name : varchar(50) <<UNIQUE>>
+}
+entity "platforms" as platforms {
+  * id : serial <<PK>>
+  --
+  * name : varchar(50) <<UNIQUE>>
+}
+entity "game_genres\n(join table)" as gg {
+  * game_id : uuid <<PK, FK>>
+  * genre_id : int <<PK, FK>>
+}
+entity "game_platforms\n(join table)" as gp {
+  * game_id : uuid <<PK, FK>>
+  * platform_id : int <<PK, FK>>
+}
+entity "library_entries" as le {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * game_id : uuid <<FK>>
+  * status : library_status
+  completed_at : timestamp
+  * added_at : timestamp
+  * updated_at : timestamp
+  ..
+  UNIQUE (user_id, game_id)
+}
+entity "wishlist_items" as wi {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * game_id : uuid <<FK>>
+  * added_at : timestamp
+  ..
+  UNIQUE (user_id, game_id)
+}
+entity "reviews" as rv {
+  * id : uuid <<PK>>
+  --
+  * user_id : uuid <<FK>>
+  * game_id : uuid <<FK>>
+  * rating : smallint (CHECK 1..10)
+  * text : text
+  * created_at : timestamp
+  * updated_at : timestamp
+  ..
+  UNIQUE (user_id, game_id)
+}
+
+users ||--|| profiles
+users ||--o{ le
+users ||--o{ wi
+users ||--o{ rv
+games ||--o{ le
+games ||--o{ wi
+games ||--o{ rv
+games ||--o{ gg
+genres ||--o{ gg
+games ||--o{ gp
+platforms ||--o{ gp
+
+legend right
+  * — NOT NULL
+  ON DELETE CASCADE для всіх FK
+  на users і games
+endlegend
+@enduml
