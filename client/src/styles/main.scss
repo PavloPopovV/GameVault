@@ -255,10 +255,12 @@ p { margin: 0; }
 /* як у картках статистики: низ обкладинки тане в чорний з розмиттям, а поверх — прозора скляна плашка з інфою */
 .game-card__media { position: relative; }
 .game-card__media::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 75%; pointer-events: none;
-  background: linear-gradient(to top, #000 0%, #000 28%, rgba(0, 0, 0, 0.85) 45%, rgba(0, 0, 0, 0.45) 70%, transparent 100%);
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 58%; pointer-events: none;
+  background: linear-gradient(to top, #000 0%, #000 34%, rgba(0, 0, 0, 0.8) 52%, rgba(0, 0, 0, 0.4) 72%, rgba(0, 0, 0, 0.12) 88%, transparent 100%);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to top, #000 60%, transparent); mask-image: linear-gradient(to top, #000 60%, transparent);
+  /* маска без різкого краю: розмиття плавно зникає на всій верхній половині шару */
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 40%, rgba(0, 0, 0, 0.6) 65%, rgba(0, 0, 0, 0.2) 85%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 40%, rgba(0, 0, 0, 0.6) 65%, rgba(0, 0, 0, 0.2) 85%, transparent 100%);
 }
 .game-card__panel {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 12px 14px 14px;
@@ -404,11 +406,14 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 .stat__bg--empty { background: radial-gradient(circle at 70% 20%, var(--accent-soft), transparent 60%), var(--surface-2); }
 /* Розмиття + акцентний відтінок під текстом: фото плавно «тане» донизу */
 .stat__glow {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 75%; z-index: -1;
-  background: linear-gradient(to top, rgba(242, 96, 12, 0.55) 0%, rgba(242, 96, 12, 0.22) 45%, transparent 100%),
-    linear-gradient(to top, rgba(15, 15, 16, 0.85) 0%, rgba(15, 15, 16, 0.35) 55%, transparent 100%);
+  position: absolute; left: 0; right: 0; bottom: 0; height: 62%; z-index: -1;
+  background:
+    linear-gradient(to top, rgba(242, 96, 12, 0.6) 0%, rgba(242, 96, 12, 0.45) 30%, rgba(242, 96, 12, 0.2) 60%, rgba(242, 96, 12, 0.06) 85%, transparent 100%),
+    linear-gradient(to top, rgba(15, 15, 16, 0.85) 0%, rgba(15, 15, 16, 0.6) 35%, rgba(15, 15, 16, 0.25) 65%, rgba(15, 15, 16, 0.08) 88%, transparent 100%);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  mask-image: linear-gradient(to top, #000 45%, transparent); -webkit-mask-image: linear-gradient(to top, #000 45%, transparent);
+  /* як на картках ігор: без різкого краю, розмиття плавно зникає догори */
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 40%, rgba(0, 0, 0, 0.6) 65%, rgba(0, 0, 0, 0.2) 85%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 40%, rgba(0, 0, 0, 0.6) 65%, rgba(0, 0, 0, 0.2) 85%, transparent 100%);
 }
 .stat__body { display: flex; flex-direction: column; gap: 2px; padding: 16px 18px; }
 .stat__value { font-size: 30px; font-weight: 800; color: #fff; line-height: 1.1; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35); }
