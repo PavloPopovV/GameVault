@@ -56,6 +56,8 @@ export default function CatalogPage() {
 
   const [genres, platforms] = taxonomy.data ?? [[], []];
   const total = list.data?.pagination.total ?? 0;
+  const hasItems = Boolean(list.data?.items.length);
+  const gridKey = list.data?.items.map((g) => g.id).join('-') ?? '';
 
   return (
     <div className="catalog">
@@ -89,27 +91,29 @@ export default function CatalogPage() {
         <div className="toolbar">
           <div>
             <h1 className="page-title">{q ? `Пошук: «${q}»` : 'Каталог ігор'}</h1>
-            {!list.loading && !list.error && <p className="muted">Знайдено {total} {pluralUk(total, ['гру', 'гри', 'ігор'])}</p>}
+            {list.data && !list.error && <p className="muted">Знайдено {total} {pluralUk(total, ['гру', 'гри', 'ігор'])}</p>}
           </div>
           <div className="toolbar__actions">
             <button type="button" className="btn btn--secondary btn--sm filters__toggle" onClick={() => setFiltersOpen(true)}>Фільтри</button>
-            <select className="select" value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Сортування">
+            <select className="select select--sm" value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Сортування">
               {SORTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
         </div>
 
-        {list.loading && <Spinner label="Завантажуємо ігри…" />}
+        {list.loading && !hasItems && <Spinner label="Завантажуємо ігри…" />}
         {list.error && <ErrorState error={list.error} onRetry={list.reload} />}
-        {list.data && list.data.items.length === 0 && (
+        {!list.loading && list.data && list.data.items.length === 0 && (
           <EmptyState title="Ігор не знайдено" text="Спробуйте змінити запит або скинути фільтри."
             action={<button type="button" className="btn btn--secondary" onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>} />
         )}
-        {list.data && list.data.items.length > 0 && (
+        {hasItems && (
           <>
-            <div className="grid">
-              {list.data.items.map((game) => (
-                <GameCard key={game.id} game={game} footer={
+            {/* Старий список лишається на місці (приглушений), поки вантажиться новий — без стрибків.
+                key міняється з набором ігор, тож нові картки з'являються з анімацією. */}
+            <div key={gridKey} className={`grid grid--animated ${list.loading ? 'grid--busy' : ''}`} aria-busy={list.loading}>
+              {list.data.items.map((game, i) => (
+                <GameCard key={game.id} game={game} index={i} footer={
                   isAuthenticated ? (
                     added.has(game.id)
                       ? <span className="badge badge--success">✓ У бібліотеці</span>
