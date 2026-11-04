@@ -15,7 +15,7 @@ on:
 jobs:
   latency:
     name: NFR-1 · час відповіді API
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults: { run: { working-directory: scripts/nfr } }
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
 
   browsers:
     name: NFR-3 · адаптивність і браузери
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults: { run: { working-directory: scripts/nfr } }
     steps:
       - uses: actions/checkout@v4
