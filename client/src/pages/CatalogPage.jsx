@@ -21,6 +21,8 @@ const SORTS = [
 // Гра вже в бібліотеці: замість кнопки — її статус, як на сторінці бібліотеки (клік веде туди)
 function LibraryBadge({ status }) {
   const s = STATUSES.find((x) => x.value === status);
+  // Невідомий статус (напр., новий на бекенді) — загальний бейдж замість падіння всього каталогу
+  if (!s) return <Link to="/library" className="badge badge--status" title="Відкрити в бібліотеці">✓ У бібліотеці</Link>;
   return (
     <Link to={`/library?status=${status}`} className="badge badge--status" title="Відкрити в бібліотеці">
       <span className={`dot status--${s.tone}`} aria-hidden="true" />
