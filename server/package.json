@@ -16,7 +16,8 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "covers:rawg": "node src/scripts/fetch-covers-rawg.js"
+    "covers:rawg": "node src/scripts/fetch-covers-rawg.js",
+    "test:integration": "vitest run --config vitest.integration.config.js"
   },
   "author": "",
   "license": "MIT",
