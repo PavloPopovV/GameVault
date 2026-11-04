@@ -39,6 +39,8 @@ rectangle "GameVault" {
   usecase "Переглянути профіль\nі статистику" as UC8
   usecase "Керувати каталогом ігор" as UC9
   usecase "Модерувати рецензії" as UC10
+  usecase "Оцінити чужу рецензію\n(лайк / дизлайк)" as UC11
+  usecase "Керувати акаунтом\n(фото, Email, видалення)" as UC12
 }
 
 Guest --> UC1
@@ -48,6 +50,8 @@ Guest --> UC4
 User --> UC5
 User --> UC7
 User --> UC8
+User --> UC11
+User --> UC12
 Admin --> UC9
 Admin --> UC10
 
@@ -55,6 +59,9 @@ UC5 ..> UC2 : <<include>>
 UC7 ..> UC2 : <<include>>
 UC8 ..> UC2 : <<include>>
 UC9 ..> UC2 : <<include>>
+UC11 ..> UC2 : <<include>>
+UC12 ..> UC2 : <<include>>
+UC7 ..> UC5 : <<include>>\n[гра має бути\nв бібліотеці]
 UC6 .> UC4 : <<extend>>\n[користувач\nавторизований]
 
 @enduml
