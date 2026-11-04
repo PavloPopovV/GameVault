@@ -9,6 +9,17 @@ import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
+// Підпис з датою залежно від статусу. updatedAt змінюється лише при зміні статусу,
+// тож для «Граю» і «Закинув» це дата, коли гру перевели в цей статус.
+function statusDate(e) {
+  switch (e.status) {
+    case 'COMPLETED': return `пройдено ${formatDate(e.completedAt ?? e.updatedAt)}`;
+    case 'DROPPED': return `закинуто ${formatDate(e.updatedAt)}`;
+    case 'PLAYING': return `граю з ${formatDate(e.updatedAt)}`;
+    default: return `додано ${formatDate(e.addedAt)}`;
+  }
+}
+
 const ChipCount = ({ value }) => (value ? <span className="chip__count">{value}</span> : null);
 
 export default function LibraryPage() {
@@ -59,7 +70,7 @@ export default function LibraryPage() {
         <div key={lib.data.map((e) => e.id).join('-')} className={`grid grid--animated ${lib.loading ? 'grid--busy' : ''}`} aria-busy={lib.loading}>
           {lib.data.map((e, i) => (
             <GameCard key={e.id} game={e.game} index={i} showRating={false}
-              meta={<>{e.game.releaseYear}{e.status === 'COMPLETED' && e.completedAt && <><br />пройдено {formatDate(e.completedAt)}</>}</>}
+              meta={<>{e.game.releaseYear}<br />{statusDate(e)}</>}
               footer={(
                 <>
                   <Select className="select--status" size="xs" value={e.status} options={STATUSES}
