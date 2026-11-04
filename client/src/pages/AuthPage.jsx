@@ -3,6 +3,10 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { validateAuthForm } from '../utils/validation.js';
+import PageBackdrop from '../components/PageBackdrop.jsx';
+
+// Фон сторінки входу — арт гри зі Steam, щоб скляній формі було що «заломлювати»
+const AUTH_BACKDROP = 'https://cdn.akamai.steamstatic.com/steam/apps/1245620/library_hero.jpg';
 
 export default function AuthPage({ mode }) {
   const { login, register, isAuthenticated } = useAuth();
@@ -57,7 +61,8 @@ export default function AuthPage({ mode }) {
 
   return (
     <div className="auth">
-      <div className="auth__card card">
+      <PageBackdrop image={AUTH_BACKDROP} />
+      <div className="auth__card card liquid">
         <div className="auth__brand">
           <img src="/favicon.svg" alt="" width="40" height="40" />
           <h1 className="brand-name">GameVault</h1>

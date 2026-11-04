@@ -561,3 +561,33 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   &:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.28); }
 }
 .game-card .dropdown--open .dropdown__button { border-color: var(--accent); }
+
+/* ---------- Мобільні картки ігор: однаковий порядок інфи й сильніше затемнення ---------- */
+@media (max-width: $bp-sm) {
+  .game-card__media::after { height: 88%; }
+  .game-card__panel { padding: 10px; }
+  /* назва → рік · жанр → рейтинг → кнопка / статус: завжди в тих самих місцях */
+  .game-card__footer:not(.game-card__footer--actions) {
+    flex-direction: column; align-items: stretch; gap: 8px;
+    .rating { align-self: flex-start; }
+    .btn, .badge--status { width: 100%; justify-content: center; }
+  }
+}
+
+/* Автозаповнення браузера: без жовто-синього фону — поле лишається як є */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+  transition: background-color 9999s ease-out 0s, color 9999s ease-out 0s;
+}
+.input:autofill { background-color: transparent; }
+
+/* Скляна форма входу / реєстрації */
+.auth__card.liquid {
+  position: relative; background: rgba(18, 18, 20, 0.35);
+  .input { background-color: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.14); }
+  .tabs { background: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.12); }
+  .tabs__tab--active { background: rgba(255, 255, 255, 0.08); }
+}
