@@ -1,7 +1,7 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { libraryEntries, reviews, wishlistItems } from '../db/schema.js';
-import { applyStatusChange } from '../domain/library.js';
+import { applyStatusChange, canAddToWishlist } from '../domain/library.js';
 import { conflict, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
 
@@ -31,11 +31,15 @@ export async function addToLibrary(userId, gameId, status = 'WANT_TO_PLAY') {
   });
   if (existing) throw conflict('Гра вже в бібліотеці');
   const fields = applyStatusChange(null, status);
-  const [entry] = await db
-    .insert(libraryEntries)
-    .values({ userId, gameId, ...fields })
-    .returning();
-  return entry;
+  // GV-27: гра або в бібліотеці, або у Wishlist — додавання в бібліотеку прибирає її з Wishlist
+  return db.transaction(async (tx) => {
+    const [entry] = await tx
+      .insert(libraryEntries)
+      .values({ userId, gameId, ...fields })
+      .returning();
+    await tx.delete(wishlistItems).where(and(eq(wishlistItems.userId, userId), eq(wishlistItems.gameId, gameId)));
+    return entry;
+  });
 }
 
 export async function changeStatus(userId, gameId, status) {
@@ -75,6 +79,12 @@ export async function addToWishlist(userId, gameId) {
     where: and(eq(wishlistItems.userId, userId), eq(wishlistItems.gameId, gameId)),
   });
   if (existing) throw conflict('Гра вже у Wishlist');
+  const entry = await db.query.libraryEntries.findFirst({
+    where: and(eq(libraryEntries.userId, userId), eq(libraryEntries.gameId, gameId)),
+    columns: { id: true },
+  });
+  if (!canAddToWishlist(entry))
+    throw conflict('Гра вже у вашій бібліотеці — Wishlist лише для ігор, яких там ще немає');
   const [item] = await db.insert(wishlistItems).values({ userId, gameId }).returning();
   return item;
 }

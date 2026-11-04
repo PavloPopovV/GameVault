@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { applyStatusChange, isValidStatus, LIBRARY_STATUSES, STATUS_LABELS } from '../../src/domain/library.js';
+import {
+  applyStatusChange,
+  canAddToWishlist,
+  isValidStatus,
+  LIBRARY_STATUSES,
+  STATUS_LABELS,
+} from '../../src/domain/library.js';
 
 const NOW = new Date('2026-11-05T12:00:00Z');
 const EARLIER = new Date('2026-10-01T10:00:00Z');
@@ -52,5 +58,19 @@ describe('isValidStatus', () => {
   it('інші значення — недопустимі', () => {
     expect(isValidStatus('playing')).toBe(false);
     expect(isValidStatus(undefined)).toBe(false);
+  });
+});
+
+describe('canAddToWishlist (GV-27)', () => {
+  it('гру, якої немає в бібліотеці, можна додати у Wishlist (позитивний)', () => {
+    expect(canAddToWishlist(null)).toBe(true);
+    expect(canAddToWishlist(undefined)).toBe(true);
+  });
+
+  it('гру з бібліотеки — не можна, незалежно від статусу (негативний)', () => {
+    // Arrange
+    const entries = ['WANT_TO_PLAY', 'PLAYING', 'COMPLETED', 'DROPPED'].map((status) => ({ id: 'e1', status }));
+    // Act + Assert
+    for (const entry of entries) expect(canAddToWishlist(entry)).toBe(false);
   });
 });
