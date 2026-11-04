@@ -1,0 +1,47 @@
+name: NFR checks (prod)
+
+# Ручний запуск: Actions → «NFR checks (prod)» → Run workflow.
+# Міряє живий продакшн, тому не запускається автоматично на кожен PR.
+on:
+  # також автоматично, коли змінюються самі скрипти замірів
+  push:
+    paths: ['scripts/nfr/**', '.github/workflows/nfr.yml']
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Скільки запитів на ендпоінт (NFR-1)'
+        default: '30'
+
+jobs:
+  latency:
+    name: NFR-1 · час відповіді API
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: scripts/nfr } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node latency.mjs
+        env: { RUNS: "${{ inputs.runs || '30' }}" }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: nfr-1-latency, path: 'scripts/nfr/latency.*' }
+
+  browsers:
+    name: NFR-3 · адаптивність і браузери
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: scripts/nfr } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps firefox webkit
+      - run: node browsers.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nfr-3-browsers
+          path: |
+            scripts/nfr/browsers.*
+            scripts/nfr/shots/
