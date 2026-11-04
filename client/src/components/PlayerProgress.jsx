@@ -112,7 +112,7 @@ export default function PlayerProgress({ stats: s }) {
                   <span className="quest__hint">{q.hint}</span>
                 </span>
                 <SegmentBar ratio={total ? count / total : 0} label={`${q.label}: ${count} з ${total}`} />
-                <span className="quest__count">{count}</span>
+                <span className="quest__count">x{String(count).padStart(2, '0')}</span>
               </Link>
             </li>
           );
