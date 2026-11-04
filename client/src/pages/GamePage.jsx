@@ -64,12 +64,14 @@ export default function GamePage() {
     try { await api.createReview(g.id, body); await afterReview('Рецензію опубліковано'); } catch (err) { toast.error(err.message); }
   };
   // Помилку показуємо тостом і прокидаємо далі, щоб модалка редагування не закрилась
-  const updateReview = async (body) => {
-    try { await api.updateReview(myReview.id, body); await afterReview('Рецензію оновлено'); } catch (err) { toast.error(err.message); throw err; }
+  const updateReview = async (id, body) => {
+    try { await api.updateReview(id, body); await afterReview('Рецензію оновлено'); } catch (err) { toast.error(err.message); throw err; }
   };
-  const deleteReview = async () => {
-    try { await api.deleteReview(myReview.id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); throw err; }
+  const deleteReview = async (id) => {
+    try { await api.deleteReview(id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); throw err; }
   };
+  // Адмін модерує будь-які рецензії (сервер це дозволяє через canModifyReview)
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
     <div className="game-page">
@@ -137,13 +139,15 @@ export default function GamePage() {
         {reviews.data && reviews.data.length === 0 && <EmptyState title="Рецензій ще немає" text="Будьте першим, хто поділиться враженнями." />}
         {reviews.data?.map((r) => {
           const mine = r.author.id === user?.id;
+          const canManage = mine || isAdmin;
           return (
             <ReviewCard key={r.id} review={r} mine={mine}
               media={<Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} size="lg" />}
               title={r.author.username}
               onVote={isAuthenticated ? (v) => api.voteReview(r.id, v) : () => { requireLogin(); return null; }}
-              onUpdate={mine ? updateReview : undefined}
-              onDelete={mine ? deleteReview : undefined} />
+              onUpdate={canManage ? (body) => updateReview(r.id, body) : undefined}
+              onDelete={canManage ? () => deleteReview(r.id) : undefined}
+              moderation={isAdmin && !mine} />
           );
         })}
       </section>

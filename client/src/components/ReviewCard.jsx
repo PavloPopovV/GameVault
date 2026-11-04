@@ -52,7 +52,7 @@ function Votes({ review, onVote }) {
   );
 }
 
-export default function ReviewCard({ review, media, title, mine = false, clamp = false, onUpdate, onDelete, onVote }) {
+export default function ReviewCard({ review, media, title, mine = false, clamp = false, onUpdate, onDelete, onVote, moderation = false }) {
   const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | null
   const [busy, setBusy] = useState(false);
   const close = () => setDialog(null);
@@ -77,7 +77,7 @@ export default function ReviewCard({ review, media, title, mine = false, clamp =
             <Votes review={review} onVote={mine ? undefined : onVote} />
           {canManage && (
             <span className="review-card__menu">
-              <ActionsMenu label="Дії з рецензією" items={[
+              <ActionsMenu label={moderation ? 'Модерація рецензії' : 'Дії з рецензією'} items={[
                 { label: 'Редагувати', onSelect: () => setDialog('edit') },
                 { label: 'Видалити', onSelect: () => setDialog('delete'), danger: true, divider: true },
               ]} />
@@ -91,12 +91,15 @@ export default function ReviewCard({ review, media, title, mine = false, clamp =
 
       {canManage && (
         <>
-          <Modal open={dialog === 'edit'} title="Редагувати рецензію" onClose={close}>
+          <Modal open={dialog === 'edit'} title={moderation ? 'Модерація: редагувати рецензію' : 'Редагувати рецензію'} onClose={close}>
             <ReviewForm plain initial={review} onSubmit={save} onCancel={close} submitLabel="Зберегти" />
           </Modal>
-          <Modal open={dialog === 'delete'} title="Видалити рецензію?" onClose={close}>
+          <Modal open={dialog === 'delete'} title={moderation ? 'Модерація: видалити рецензію?' : 'Видалити рецензію?'} onClose={close}>
             <div className="form">
-              <p className="modal__text">Рецензію буде видалено назавжди. Цю дію <b>не можна скасувати</b>.</p>
+              <p className="modal__text">
+                {moderation && 'Ви видаляєте чужу рецензію як адміністратор. '}
+                Рецензію буде видалено назавжди. Цю дію <b>не можна скасувати</b>.
+              </p>
               <div className="modal__actions">
                 <button type="button" className="btn btn--ghost" onClick={close}>Скасувати</button>
                 <button type="button" className="btn btn--danger-solid" onClick={remove} disabled={busy}>{busy ? 'Видаляємо…' : 'Видалити'}</button>
