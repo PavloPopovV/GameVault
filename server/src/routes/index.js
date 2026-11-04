@@ -33,6 +33,15 @@ r.get(
   requireAuth,
   h(async (req, res) => res.json(await usersSvc.getMe(req.user.id))),
 );
+r.delete(
+  '/users/me',
+  requireAuth,
+  validate(S.deleteAccountSchema),
+  h(async (req, res) => {
+    await usersSvc.deleteAccount(req.user.id, req.body);
+    res.status(204).end();
+  }),
+);
 r.get(
   '/users/me/reviews',
   requireAuth,

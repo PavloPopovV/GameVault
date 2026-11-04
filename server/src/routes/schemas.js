@@ -71,6 +71,10 @@ export const updateReviewSchema = z
   .object({ rating: rating.optional(), text: reviewText.optional() })
   .refine((o) => o.rating !== undefined || o.text !== undefined, 'Немає полів для оновлення');
 
+export const deleteAccountSchema = z.object({
+  password: z.string().min(1, 'Введіть пароль').max(72),
+});
+
 export const updateProfileSchema = z
   .object({
     username: registerSchema.shape.username.optional(),

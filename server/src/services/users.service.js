@@ -3,7 +3,8 @@ import { desc, eq, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { users, profiles, libraryEntries, reviews, wishlistItems, games } from '../db/schema.js';
 import { buildProfileStats } from '../domain/stats.js';
-import { badRequest, conflict, notFound } from '../utils/errors.js';
+import { badRequest, conflict, forbidden, notFound } from '../utils/errors.js';
+import { isDemoAccount } from '../config/demo.js';
 import { publicUser } from './auth.service.js';
 
 export async function getMe(userId) {
@@ -30,6 +31,7 @@ export async function updateProfile(userId, { username, bio, email, currentPassw
     const me = await db.query.users.findFirst({ where: eq(users.id, userId) });
     if (!me) throw notFound('Користувача не знайдено');
     if (normalizedEmail !== me.email) {
+      if (isDemoAccount(me.email)) throw forbidden('Email демо-акаунта змінити не можна');
       const ok = await bcrypt.compare(currentPassword ?? '', me.passwordHash);
       if (!ok) {
         const message = 'Невірний поточний пароль';
@@ -72,4 +74,17 @@ export function listMyReviews(userId) {
     .innerJoin(games, eq(games.id, reviews.gameId))
     .where(eq(reviews.userId, userId))
     .orderBy(desc(reviews.updatedAt));
+}
+
+/** Видалення акаунта з підтвердженням паролем. Бібліотека, Wishlist, рецензії й профіль видаляються каскадно. */
+export async function deleteAccount(userId, { password }) {
+  const me = await db.query.users.findFirst({ where: eq(users.id, userId) });
+  if (!me) throw notFound('Користувача не знайдено');
+  if (isDemoAccount(me.email)) throw forbidden('Демо-акаунт видалити не можна');
+  const ok = await bcrypt.compare(password, me.passwordHash);
+  if (!ok) {
+    const message = 'Невірний пароль';
+    throw badRequest(message, [{ field: 'password', message }]);
+  }
+  await db.delete(users).where(eq(users.id, userId));
 }

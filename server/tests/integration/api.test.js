@@ -162,3 +162,24 @@ describe('Profile API', () => {
     expect((await api('post', '/auth/login').send({ email: 'grace.new@test.dev', password: 'Secret123' })).status).toBe(200);
   });
 });
+
+describe('Delete account API', () => {
+  it('видалення: невірний пароль 400, успіх 204 → вхід 401, токен більше не діє', async () => {
+    const token = await registerUser('ivan');
+    const auth = { Authorization: `Bearer ${token}` };
+    await api('post', '/library').set(auth).send({ gameId });
+    const wrong = await api('delete', '/users/me').set(auth).send({ password: 'WrongPass1' });
+    expect(wrong.status).toBe(400);
+    expect(wrong.body.details[0].field).toBe('password');
+    expect((await api('delete', '/users/me').set(auth).send({ password: 'Secret123' })).status).toBe(204);
+    expect((await api('post', '/auth/login').send({ email: 'ivan@test.dev', password: 'Secret123' })).status).toBe(401);
+    expect((await api('get', '/users/me').set(auth)).status).toBe(404);
+  });
+
+  it('демо-акаунт не можна видалити або змінити йому Email → 403', async () => {
+    const res = await api('post', '/auth/register').send({ email: 'demo@gamevault.dev', username: 'demo_gamer', password: 'Demo12345' });
+    const auth = { Authorization: `Bearer ${res.body.token}` };
+    expect((await api('delete', '/users/me').set(auth).send({ password: 'Demo12345' })).status).toBe(403);
+    expect((await api('patch', '/users/me').set(auth).send({ email: 'x@test.dev', currentPassword: 'Demo12345' })).status).toBe(403);
+  });
+});
