@@ -8,6 +8,7 @@ import GamePage from './pages/GamePage.jsx';
 import LibraryPage from './pages/LibraryPage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import AdminGamesPage from './pages/AdminGamesPage.jsx';
 
 const guard = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
 
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="library" element={guard(<LibraryPage />)} />
         <Route path="wishlist" element={guard(<WishlistPage />)} />
         <Route path="profile" element={guard(<ProfilePage />)} />
+        <Route path="admin/games" element={guard(<AdminGamesPage />)} />
         <Route path="dashboard" element={guard(<LibraryPage />)} />
         <Route path="*" element={<EmptyState title="Сторінку не знайдено" action={<Link to="/" className="btn btn--primary">На головну</Link>} />} />
       </Route>

@@ -280,3 +280,37 @@ describe('Review votes API', () => {
     expect(off.body).toMatchObject({ likes: 0, dislikes: 0, myVote: 0 });
   });
 });
+
+describe('GV-17: керування каталогом (адмін)', () => {
+  it('гравцю 403; адмін створює, дубль назви 409, редагує й очищає поля, видаляє', async () => {
+    const player = { Authorization: `Bearer ${await registerUser('henry')}` };
+    await registerUser('ivy');
+    await db.execute(sql`UPDATE users SET role = 'ADMIN' WHERE username = 'ivy'`);
+    // роль зашита в JWT, тож токен адміна беремо після зміни ролі
+    const login = await api('post', '/auth/login').send({ email: 'ivy@test.dev', password: 'Secret123' });
+    const admin = { Authorization: `Bearer ${login.body.token}` };
+
+    const body = { title: 'Admin Quest', releaseYear: 2025, developer: 'Studio', genres: ['RPG'] };
+    expect((await api('post', '/games').set(player).send(body)).status).toBe(403);
+    expect((await api('post', '/games').set(admin).send({ title: '' })).status).toBe(400);
+
+    const created = await api('post', '/games').set(admin).send(body);
+    expect(created.status).toBe(201);
+    expect(created.body).toMatchObject({ slug: 'admin-quest', genres: ['RPG'] });
+
+    const dup = await api('post', '/games').set(admin).send({ title: 'admin quest' });
+    expect(dup.status).toBe(409);
+    expect(dup.body.details).toEqual([{ field: 'title', message: 'Гра з такою назвою вже є в каталозі' }]);
+    // Перейменування на назву іншої гри — теж 409; збереження власної назви — ні
+    expect((await api('patch', `/games/${created.body.id}`).set(admin).send({ title: 'Test Quest' })).status).toBe(409);
+
+    const upd = await api('patch', `/games/${created.body.id}`)
+      .set(admin)
+      .send({ title: 'Admin Quest', developer: null, releaseYear: null, genres: [] });
+    expect(upd.status).toBe(200);
+    expect(upd.body).toMatchObject({ developer: null, releaseYear: null, genres: [] });
+
+    expect((await api('delete', `/games/${created.body.id}`).set(admin)).status).toBe(204);
+    expect((await api('get', `/games/${created.body.id}`)).status).toBe(404);
+  });
+});
