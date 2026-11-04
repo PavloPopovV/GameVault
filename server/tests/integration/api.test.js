@@ -87,7 +87,7 @@ describe('Catalog + Library + Reviews API', () => {
   });
 
   it('GV-19: каталог повертає статус гри в бібліотеці користувача', async () => {
-    const token = await registerUser('dave');
+    const token = await registerUser('erin');
     const auth = { Authorization: `Bearer ${token}` };
     // гість і користувач без гри в бібліотеці — статусу немає
     expect((await api('get', '/games')).body.items[0].libraryStatus).toBeUndefined();
