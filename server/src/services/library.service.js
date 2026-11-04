@@ -11,11 +11,17 @@ export async function listLibrary(userId, status) {
   const where = status
     ? and(eq(libraryEntries.userId, userId), eq(libraryEntries.status, status))
     : eq(libraryEntries.userId, userId);
-  return db.query.libraryEntries.findMany({
-    where,
-    orderBy: desc(libraryEntries.updatedAt),
-    with: { game: { columns: gameColumns } },
-  });
+  const [entries, myReviews] = await Promise.all([
+    db.query.libraryEntries.findMany({
+      where,
+      orderBy: desc(libraryEntries.updatedAt),
+      with: { game: { columns: gameColumns } },
+    }),
+    db.select({ gameId: reviews.gameId }).from(reviews).where(eq(reviews.userId, userId)),
+  ]);
+  // hasReview — щоб попередити, що разом з грою з бібліотеки зникне й рецензія (GV-20)
+  const reviewed = new Set(myReviews.map((r) => r.gameId));
+  return entries.map((e) => ({ ...e, hasReview: reviewed.has(e.gameId) }));
 }
 
 export async function addToLibrary(userId, gameId, status = 'WANT_TO_PLAY') {

@@ -47,7 +47,11 @@ export default function GamePage() {
     () => (me?.libraryStatus ? api.setStatus(g.id, status) : api.addToLibrary(g.id, status)),
     me?.libraryStatus ? 'Статус оновлено' : 'Гру додано в бібліотеку',
   );
-  const onRemove = () => run(() => api.removeFromLibrary(g.id), 'Гру прибрано з бібліотеки');
+  const onRemove = () => {
+    // Рецензія можлива лише на гру з бібліотеки, тож прибирання гри видаляє й рецензію (GV-20)
+    if (me?.reviewId && !window.confirm('Разом з грою буде видалено вашу рецензію. Продовжити?')) return;
+    run(async () => { await api.removeFromLibrary(g.id); if (me?.reviewId) await reviews.reload(); }, 'Гру прибрано з бібліотеки');
+  };
   const onWishlist = () => (isAuthenticated
     ? run(() => (me.inWishlist ? api.removeFromWishlist(g.id) : api.addToWishlist(g.id)), me.inWishlist ? 'Прибрано з Wishlist' : 'Додано у Wishlist')
     : requireLogin());
@@ -113,7 +117,14 @@ export default function GamePage() {
             <Link to="/login" state={{ from: `/games/${slug}` }}>Увійдіть</Link>, щоб залишити рецензію.
           </div>
         )}
-        {isAuthenticated && !myReview && !reviews.loading && <ReviewForm onSubmit={createReview} />}
+        {isAuthenticated && !myReview && !reviews.loading && (me?.libraryStatus
+          ? <ReviewForm onSubmit={createReview} />
+          : (
+            <div className="card notice notice--row">
+              <span>Рецензію можна написати лише на гру з вашої бібліотеки.</span>
+              <button type="button" className="btn btn--outline btn--sm" onClick={() => onStatus('WANT_TO_PLAY')}>+ Додати в бібліотеку</button>
+            </div>
+          ))}
         {isAuthenticated && myReview && editing && (
           <ReviewForm initial={myReview} onSubmit={updateReview} onCancel={() => setEditing(false)} submitLabel="Зберегти" />
         )}
