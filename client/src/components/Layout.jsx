@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Бейдж-лічильник як у кошика магазину: лише коли є хоча б одна гра.
+// key={value} перезапускає анімацію «підстрибування» при кожній зміні числа.
+function Counter({ value }) {
+  if (!value) return null;
+  return (
+    <span key={value} className="nav__count">
+      {value > 99 ? '99+' : value}
+      <span className="sr-only"> ігор</span>
+    </span>
+  );
+}
+
 export default function Layout() {
   const { user, isAuthenticated } = useAuth();
   const [params] = useSearchParams();
@@ -51,8 +63,8 @@ export default function Layout() {
             <NavLink to="/" end className="nav__link">Каталог</NavLink>
             {isAuthenticated && (
               <>
-                <NavLink to="/library" className="nav__link">Моя бібліотека</NavLink>
-                <NavLink to="/wishlist" className="nav__link">Wishlist</NavLink>
+                <NavLink to="/library" className="nav__link">Моя бібліотека<Counter value={user.stats?.totalGames} /></NavLink>
+                <NavLink to="/wishlist" className="nav__link">Wishlist<Counter value={user.stats?.wishlistCount} /></NavLink>
               </>
             )}
             {isAuthenticated ? (

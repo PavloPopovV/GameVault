@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, setUnauthorizedHandler, tokenStorage } from '../api/client.js';
+import { api, setCollectionChangeHandler, setUnauthorizedHandler, tokenStorage } from '../api/client.js';
 
 const AuthContext = createContext(null);
 
@@ -17,6 +17,12 @@ export function AuthProvider({ children }) {
     setUser(me);
     return me;
   }, []);
+
+  // Бібліотека чи Wishlist змінились — тихо підтягуємо свіжу статистику для лічильників
+  useEffect(() => {
+    setCollectionChangeHandler(() => { refresh().catch(() => {}); });
+    return () => setCollectionChangeHandler(() => {});
+  }, [refresh]);
 
   useEffect(() => {
     setUnauthorizedHandler(logout);

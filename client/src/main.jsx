@@ -5,6 +5,8 @@ import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
+// Піксельний шрифт лого — у бандлі (лише латиниця), без залежності від Google Fonts
+import '@fontsource/press-start-2p/latin-400.css';
 import './styles/main.scss';
 
 createRoot(document.getElementById('root')).render(
