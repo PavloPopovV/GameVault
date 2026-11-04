@@ -83,7 +83,7 @@ export default function Select({ value, options, onChange, label, id, size = 'md
       </button>
 
       {open && (
-        <ul className="dropdown__menu" role="listbox" id={listId} aria-label={label} ref={listRef}>
+        <ul className="dropdown__menu liquid" role="listbox" id={listId} aria-label={label} ref={listRef}>
           {options.map((o, i) => (
             <li
               key={o.value}

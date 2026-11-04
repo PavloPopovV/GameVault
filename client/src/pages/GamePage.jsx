@@ -6,6 +6,8 @@ import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
 import ReviewForm from '../components/ReviewForm.jsx';
 import ReviewCard from '../components/ReviewCard.jsx';
+import PageBackdrop from '../components/PageBackdrop.jsx';
+import { heroUrl } from '../utils/hero.js';
 import Avatar from '../components/Avatar.jsx';
 import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
@@ -70,6 +72,7 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
+      <PageBackdrop image={heroUrl(g.coverUrl)} />
       <nav className="breadcrumbs"><Link to="/">Каталог</Link> / <span>{g.title}</span></nav>
 
       <section className="game-hero">
