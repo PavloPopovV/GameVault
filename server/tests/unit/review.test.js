@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateReview, canModifyReview } from '../../src/domain/review.js';
+import { validateReview, canModifyReview, canReviewGame } from '../../src/domain/review.js';
 
 const okText = 'Чудова гра, рекомендую всім!';
 
@@ -58,5 +58,17 @@ describe('canModifyReview', () => {
   it('без рецензії або користувача — false', () => {
     expect(canModifyReview(null, { id: 'u1' })).toBe(false);
     expect(canModifyReview(review, null)).toBe(false);
+  });
+});
+
+describe('canReviewGame (GV-20)', () => {
+  it('гра в бібліотеці з будь-яким статусом — можна писати рецензію', () => {
+    for (const status of ['WANT_TO_PLAY', 'PLAYING', 'COMPLETED', 'DROPPED']) {
+      expect(canReviewGame({ gameId: 'g1', status })).toBe(true);
+    }
+  });
+  it('гри немає в бібліотеці — не можна', () => {
+    expect(canReviewGame(null)).toBe(false);
+    expect(canReviewGame(undefined)).toBe(false);
   });
 });

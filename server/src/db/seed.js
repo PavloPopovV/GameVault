@@ -291,6 +291,11 @@ async function main() {
     { userId: player.id, gameId: byTitle['Hades'], status: 'COMPLETED', completedAt: now },
     { userId: player.id, gameId: byTitle['Cyberpunk 2077'], status: 'DROPPED' },
     { userId: player.id, gameId: byTitle["Baldur's Gate 3"], status: 'WANT_TO_PLAY' },
+    // Рецензію можна написати лише на гру з бібліотеки (GV-20)
+    ...['The Witcher 3: Wild Hunt', 'Hades', 'Elden Ring', 'Hollow Knight'].map((t) => ({
+      userId: demo.id, gameId: byTitle[t], status: 'COMPLETED', completedAt: now,
+    })),
+    { userId: admin.id, gameId: byTitle['Stardew Valley'], status: 'PLAYING' },
   ]);
   await db.insert(wishlistItems).values([
     { userId: player.id, gameId: byTitle['S.T.A.L.K.E.R. 2: Heart of Chornobyl'] },

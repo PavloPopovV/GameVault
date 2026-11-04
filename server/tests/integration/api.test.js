@@ -100,6 +100,18 @@ describe('Catalog + Library + Reviews API', () => {
   it('рецензія: валідація 400, створення, середня оцінка, чужа рецензія 403', async () => {
     const t1 = await registerUser('carol');
     const t2 = await registerUser('dave');
+    // GV-20: рецензія лише на гру з бібліотеки — без запису в бібліотеці 403
+    expect(
+      (
+        await api('post', `/games/${gameId}/reviews`)
+          .set({ Authorization: `Bearer ${t1}` })
+          .send({ rating: 8, text: 'Дуже добра тестова гра' })
+      ).status,
+    ).toBe(403);
+    for (const t of [t1, t2])
+      await api('post', '/library')
+        .set({ Authorization: `Bearer ${t}` })
+        .send({ gameId });
     expect(
       (
         await api('post', `/games/${gameId}/reviews`)
@@ -134,6 +146,7 @@ describe('Profile API', () => {
     const token = await registerUser('frank');
     const auth = { Authorization: `Bearer ${token}` };
     expect((await api('get', '/users/me/reviews').set(auth)).body).toEqual([]);
+    await api('post', '/library').set(auth).send({ gameId, status: 'COMPLETED' });
     await api('post', `/games/${gameId}/reviews`).set(auth).send({ rating: 7, text: 'Непогана тестова гра' });
     const res = await api('get', '/users/me/reviews').set(auth);
     expect(res.status).toBe(200);
@@ -159,7 +172,21 @@ describe('Profile API', () => {
     const ok = await patch({ email: 'Grace.New@Test.dev', currentPassword: 'Secret123' });
     expect(ok.status).toBe(200);
     expect(ok.body.email).toBe('grace.new@test.dev');
-    expect((await api('post', '/auth/login').send({ email: 'grace.new@test.dev', password: 'Secret123' })).status).toBe(200);
+    expect((await api('post', '/auth/login').send({ email: 'grace.new@test.dev', password: 'Secret123' })).status).toBe(
+      200,
+    );
+  });
+});
+
+describe('GV-20: рецензії й бібліотека узгоджені', () => {
+  it('прибрати гру з бібліотеки → рецензія на неї теж видаляється', async () => {
+    const token = await registerUser('judy');
+    const auth = { Authorization: `Bearer ${token}` };
+    await api('post', '/library').set(auth).send({ gameId, status: 'COMPLETED' });
+    await api('post', `/games/${gameId}/reviews`).set(auth).send({ rating: 9, text: 'Пройшла і задоволена' });
+    expect((await api('get', '/users/me/reviews').set(auth)).body).toHaveLength(1);
+    expect((await api('delete', `/library/${gameId}`).set(auth)).status).toBe(204);
+    expect((await api('get', '/users/me/reviews').set(auth)).body).toHaveLength(0);
   });
 });
 
@@ -177,9 +204,15 @@ describe('Delete account API', () => {
   });
 
   it('демо-акаунт не можна видалити або змінити йому Email → 403', async () => {
-    const res = await api('post', '/auth/register').send({ email: 'demo@gamevault.dev', username: 'demo_gamer', password: 'Demo12345' });
+    const res = await api('post', '/auth/register').send({
+      email: 'demo@gamevault.dev',
+      username: 'demo_gamer',
+      password: 'Demo12345',
+    });
     const auth = { Authorization: `Bearer ${res.body.token}` };
     expect((await api('delete', '/users/me').set(auth).send({ password: 'Demo12345' })).status).toBe(403);
-    expect((await api('patch', '/users/me').set(auth).send({ email: 'x@test.dev', currentPassword: 'Demo12345' })).status).toBe(403);
+    expect(
+      (await api('patch', '/users/me').set(auth).send({ email: 'x@test.dev', currentPassword: 'Demo12345' })).status,
+    ).toBe(403);
   });
 });

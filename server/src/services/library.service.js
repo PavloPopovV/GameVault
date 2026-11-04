@@ -1,6 +1,6 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { libraryEntries, wishlistItems } from '../db/schema.js';
+import { libraryEntries, reviews, wishlistItems } from '../db/schema.js';
 import { applyStatusChange } from '../domain/library.js';
 import { conflict, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
@@ -42,12 +42,16 @@ export async function changeStatus(userId, gameId, status) {
   return updated;
 }
 
+/** Прибирає гру з бібліотеки разом із рецензією на неї: рецензія можлива лише на гру з бібліотеки (GV-20). */
 export async function removeFromLibrary(userId, gameId) {
-  const res = await db
-    .delete(libraryEntries)
-    .where(and(eq(libraryEntries.userId, userId), eq(libraryEntries.gameId, gameId)))
-    .returning({ id: libraryEntries.id });
-  if (!res.length) throw notFound('Гри немає у вашій бібліотеці');
+  await db.transaction(async (tx) => {
+    const res = await tx
+      .delete(libraryEntries)
+      .where(and(eq(libraryEntries.userId, userId), eq(libraryEntries.gameId, gameId)))
+      .returning({ id: libraryEntries.id });
+    if (!res.length) throw notFound('Гри немає у вашій бібліотеці');
+    await tx.delete(reviews).where(and(eq(reviews.userId, userId), eq(reviews.gameId, gameId)));
+  });
 }
 
 // ---- Wishlist ----

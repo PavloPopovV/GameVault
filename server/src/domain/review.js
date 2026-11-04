@@ -28,6 +28,14 @@ export function validateReview(input, { partial = false } = {}) {
   return errors;
 }
 
+/**
+ * Чи може користувач написати рецензію на гру: лише якщо гра є в його бібліотеці
+ * (з будь-яким статусом). libraryEntry — запис бібліотеки або null.
+ */
+export function canReviewGame(libraryEntry) {
+  return Boolean(libraryEntry);
+}
+
 /** Чи може користувач змінювати / видаляти рецензію. */
 export function canModifyReview(review, user) {
   if (!review || !user) return false;
