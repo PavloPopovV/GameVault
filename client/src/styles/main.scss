@@ -281,11 +281,20 @@ p { margin: 0; }
 .reviews { display: flex; flex-direction: column; gap: 14px; }
 .review-form { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .rating-picker { display: flex; flex-wrap: wrap; gap: 6px; }
-.review { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
-.review--mine { border-color: var(--accent-line); }
-.review__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.review__rating { margin-left: auto; }
-.review__text { color: var(--text-soft); white-space: pre-line; }
+.review-form--plain { padding: 0; .chip { min-width: 34px; padding: 0 8px; } .rating-picker { gap: 5px; } }
+/* Плашка рецензії — однакова на сторінці гри і в профілі */
+.review-card { display: flex; align-items: flex-start; gap: 16px; padding: 14px 16px; }
+.review-card--mine { border-color: var(--accent-line); }
+.review-card__media { flex-shrink: 0; display: flex; }
+.review-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.review-card__head { display: flex; align-items: center; gap: 12px; min-height: 32px; }
+.review-card__title { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.review-card__link:hover { color: var(--accent); }
+.review-card__rating { flex-shrink: 0; }
+.review-card__menu { margin-left: auto; margin-right: -6px; }
+.review-card__text { color: var(--text-soft); white-space: pre-line; }
+.review-card__text--clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.review-card__date { font-size: 13px; color: var(--muted); }
 
 /* ---------- Lists (library / wishlist) ---------- */
 .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -303,13 +312,6 @@ p { margin: 0; }
 .profile__bio--empty { color: var(--muted); font-style: italic; }
 .profile__meta { color: var(--muted); font-size: 14px; }
 .profile__reviews { display: flex; flex-direction: column; }
-.list-item--top { align-items: flex-start; }
-.review-item__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.review-item__text {
-  margin-top: 6px; color: var(--text-soft); white-space: pre-line;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
-.review-item__date { margin-top: 6px; font-size: 13px; color: var(--muted); }
 
 /* ---------- Modal ---------- */
 .modal {

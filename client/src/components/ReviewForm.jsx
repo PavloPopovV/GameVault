@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { validateReview } from '../utils/validation.js';
 
-export default function ReviewForm({ initial, onSubmit, onCancel, submitLabel = 'Опублікувати' }) {
+export default function ReviewForm({ initial, onSubmit, onCancel, submitLabel = 'Опублікувати', plain = false }) {
   const [rating, setRating] = useState(initial?.rating ?? 0);
   const [text, setText] = useState(initial?.text ?? '');
   const [errors, setErrors] = useState({});
@@ -22,7 +22,7 @@ export default function ReviewForm({ initial, onSubmit, onCancel, submitLabel = 
   };
 
   return (
-    <form className="review-form card" onSubmit={submit} noValidate>
+    <form className={`review-form ${plain ? 'review-form--plain' : 'card'}`} onSubmit={submit} noValidate>
       <div className="field">
         <span className="field__label">Оцінка</span>
         <div className="rating-picker" role="radiogroup" aria-label="Оцінка від 1 до 10">
@@ -42,10 +42,17 @@ export default function ReviewForm({ initial, onSubmit, onCancel, submitLabel = 
         <span className="field__hint">{text.trim().length} / 2000</span>
         {errors.text && <span className="field__error">{errors.text}</span>}
       </label>
-      <div className="row">
-        <button type="submit" className="btn btn--primary" disabled={busy}>{busy ? 'Зберігаємо…' : submitLabel}</button>
-        {onCancel && <button type="button" className="btn btn--ghost" onClick={onCancel}>Скасувати</button>}
-      </div>
+      {plain ? (
+        <div className="modal__actions">
+          {onCancel && <button type="button" className="btn btn--ghost" onClick={onCancel}>Скасувати</button>}
+          <button type="submit" className="btn btn--primary" disabled={busy}>{busy ? 'Зберігаємо…' : submitLabel}</button>
+        </div>
+      ) : (
+        <div className="row">
+          <button type="submit" className="btn btn--primary" disabled={busy}>{busy ? 'Зберігаємо…' : submitLabel}</button>
+          {onCancel && <button type="button" className="btn btn--ghost" onClick={onCancel}>Скасувати</button>}
+        </div>
+      )}
     </form>
   );
 }

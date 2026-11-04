@@ -9,6 +9,7 @@ import Modal from '../components/Modal.jsx';
 import ActionsMenu from '../components/ActionsMenu.jsx';
 import Avatar from '../components/Avatar.jsx';
 import PlayerProgress from '../components/PlayerProgress.jsx';
+import ReviewCard from '../components/ReviewCard.jsx';
 import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
@@ -204,6 +205,11 @@ function ProfileStats({ stats: s, reviews }) {
 }
 
 function MyReviews({ list }) {
+  const toast = useToast();
+  // Помилку показуємо тостом і прокидаємо далі, щоб модалка не закрилась
+  const run = async (fn, success) => {
+    try { await fn(); toast.success(success); await list.reload(); } catch (err) { toast.error(err.message); throw err; }
+  };
   return (
     <section className="profile__reviews">
       <h2 className="section-title">Мої рецензії{list.data?.length ? <span className="muted"> · {list.data.length}</span> : null}</h2>
@@ -214,21 +220,15 @@ function MyReviews({ list }) {
           action={<Link to="/" className="btn btn--primary">До каталогу</Link>} />
       )}
       {list.data?.length > 0 && (
-        <ul className="list">
+        <div className="reviews">
           {list.data.map((r) => (
-            <li key={r.id} className="list-item list-item--top card">
-              <Link to={`/games/${r.game.slug}`} className="list-item__cover"><GameCover title={r.game.title} coverUrl={r.game.coverUrl} size="sm" /></Link>
-              <div className="list-item__info">
-                <div className="review-item__head">
-                  <Link to={`/games/${r.game.slug}`} className="list-item__title">{r.game.title}</Link>
-                  <span className="rating" aria-label={`Оцінка ${r.rating} з 10`}>★ {r.rating}<span className="muted">/10</span></span>
-                </div>
-                {r.text && <p className="review-item__text">{r.text}</p>}
-                <span className="review-item__date">{formatDate(r.updatedAt)}</span>
-              </div>
-            </li>
+            <ReviewCard key={r.id} review={r} clamp
+              media={<Link to={`/games/${r.game.slug}`} tabIndex={-1} aria-hidden="true"><GameCover title={r.game.title} coverUrl={r.game.coverUrl} size="sm" /></Link>}
+              title={<Link to={`/games/${r.game.slug}`} className="review-card__link">{r.game.title}</Link>}
+              onUpdate={(body) => run(() => api.updateReview(r.id, body), 'Рецензію оновлено')}
+              onDelete={() => run(() => api.deleteReview(r.id), 'Рецензію видалено')} />
           ))}
-        </ul>
+        </div>
       )}
     </section>
   );

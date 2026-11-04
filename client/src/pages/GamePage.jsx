@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
@@ -6,17 +5,17 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
 import ReviewForm from '../components/ReviewForm.jsx';
+import ReviewCard from '../components/ReviewCard.jsx';
 import Avatar from '../components/Avatar.jsx';
 import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
-import { STATUSES, formatDate, pluralUk } from '../utils/constants.js';
+import { STATUSES, pluralUk } from '../utils/constants.js';
 
 export default function GamePage() {
   const { slug } = useParams();
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const [editing, setEditing] = useState(false);
 
   const game = useAsync(() => api.game(slug), [slug, isAuthenticated]);
   const gameId = game.data?.id;
@@ -57,16 +56,16 @@ export default function GamePage() {
     ? run(() => (me.inWishlist ? api.removeFromWishlist(g.id) : api.addToWishlist(g.id)), me.inWishlist ? 'Прибрано з Wishlist' : 'Додано у Wishlist')
     : requireLogin());
 
-  const afterReview = async (msg) => { toast.success(msg); setEditing(false); await Promise.all([reviews.reload(), game.reload()]); };
+  const afterReview = async (msg) => { toast.success(msg); await Promise.all([reviews.reload(), game.reload()]); };
   const createReview = async (body) => {
     try { await api.createReview(g.id, body); await afterReview('Рецензію опубліковано'); } catch (err) { toast.error(err.message); }
   };
+  // Помилку показуємо тостом і прокидаємо далі, щоб модалка редагування не закрилась
   const updateReview = async (body) => {
-    try { await api.updateReview(myReview.id, body); await afterReview('Рецензію оновлено'); } catch (err) { toast.error(err.message); }
+    try { await api.updateReview(myReview.id, body); await afterReview('Рецензію оновлено'); } catch (err) { toast.error(err.message); throw err; }
   };
   const deleteReview = async () => {
-    if (!window.confirm('Видалити вашу рецензію? Цю дію не можна скасувати.')) return;
-    try { await api.deleteReview(myReview.id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); }
+    try { await api.deleteReview(myReview.id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); throw err; }
   };
 
   return (
@@ -126,30 +125,20 @@ export default function GamePage() {
               <button type="button" className="btn btn--outline btn--sm" onClick={() => onStatus('WANT_TO_PLAY')}>+ Додати в бібліотеку</button>
             </div>
           ))}
-        {isAuthenticated && myReview && editing && (
-          <ReviewForm initial={myReview} onSubmit={updateReview} onCancel={() => setEditing(false)} submitLabel="Зберегти" />
-        )}
 
         {reviews.loading && <Spinner label="Завантажуємо рецензії…" />}
         {reviews.error && <ErrorState error={reviews.error} onRetry={reviews.reload} />}
         {reviews.data && reviews.data.length === 0 && <EmptyState title="Рецензій ще немає" text="Будьте першим, хто поділиться враженнями." />}
-        {reviews.data?.map((r) => (
-          <article key={r.id} className={`review card ${r.author.id === user?.id ? 'review--mine' : ''}`}>
-            <header className="review__head">
-              <Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} />
-              <strong>{r.author.username}</strong>
-              <span className="muted">· {formatDate(r.createdAt)}</span>
-              <span className="rating review__rating">★ {r.rating}</span>
-            </header>
-            <p className="review__text">{r.text}</p>
-            {r.author.id === user?.id && !editing && (
-              <div className="row">
-                <button type="button" className="btn btn--ghost btn--sm" onClick={() => setEditing(true)}>Редагувати</button>
-                <button type="button" className="btn btn--ghost btn--sm btn--danger" onClick={deleteReview}>Видалити</button>
-              </div>
-            )}
-          </article>
-        ))}
+        {reviews.data?.map((r) => {
+          const mine = r.author.id === user?.id;
+          return (
+            <ReviewCard key={r.id} review={r} mine={mine}
+              media={<Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} size="lg" />}
+              title={r.author.username}
+              onUpdate={mine ? updateReview : undefined}
+              onDelete={mine ? deleteReview : undefined} />
+          );
+        })}
       </section>
     </div>
   );
