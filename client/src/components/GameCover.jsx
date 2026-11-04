@@ -7,7 +7,7 @@ function hash(str) {
   return Math.abs(h);
 }
 
-function Placeholder({ title, size }) {
+function Placeholder({ title, size, decorative }) {
   const h = hash(title);
   const hue1 = h % 360;
   const hue2 = (hue1 + 40 + (h % 80)) % 360;
@@ -23,23 +23,26 @@ function Placeholder({ title, size }) {
     <div
       className={`cover cover--${size} cover--generated`}
       style={{ background: `linear-gradient(135deg, hsl(${hue1} 65% 42%), hsl(${hue2} 70% 22%))` }}
-      role="img"
-      aria-label={`Обкладинка ${title}`}
+      {...(decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': `Обкладинка ${title}` })}
     >
       <span className="cover__initials">{initials}</span>
     </div>
   );
 }
 
-/** Обкладинка гри: реальне фото, а якщо його немає або воно не завантажилось — кольорова заглушка. */
-export default function GameCover({ title, coverUrl, size = 'md' }) {
+/**
+ * Обкладинка гри: реальне фото, а якщо його немає або воно не завантажилось — кольорова заглушка.
+ * decorative=true (за замовчуванням) — у картках і списках, де назва вже є текстом поруч:
+ * порожній alt, щоб скрінрідер не озвучував назву двічі.
+ */
+export default function GameCover({ title, coverUrl, size = 'md', decorative = true }) {
   const [failedUrl, setFailedUrl] = useState(null);
-  if (!coverUrl || failedUrl === coverUrl) return <Placeholder title={title} size={size} />;
+  if (!coverUrl || failedUrl === coverUrl) return <Placeholder title={title} size={size} decorative={decorative} />;
   return (
     <img
       className={`cover cover--${size}`}
       src={coverUrl}
-      alt={`Обкладинка ${title}`}
+      alt={decorative ? '' : `Обкладинка ${title}`}
       loading="lazy"
       decoding="async"
       onError={() => setFailedUrl(coverUrl)}
