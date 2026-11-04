@@ -160,20 +160,44 @@ function StatCard({ value, label, cover, to }) {
   return to ? <Link to={to} className="stat card">{content}</Link> : <div className="stat card">{content}</div>;
 }
 
+/**
+ * Обирає 5 різних обкладинок: для кожної картки — перша ще не використана з її тематичних ігор,
+ * а якщо таких немає — наступна незайнята з каталогу.
+ */
+function pickCovers(candidatesPerCard, catalog) {
+  const used = new Set();
+  const take = (games) => {
+    const game = games.find((g) => g?.coverUrl && !used.has(g.coverUrl));
+    if (game) used.add(game.coverUrl);
+    return game?.coverUrl ?? null;
+  };
+  return candidatesPerCard.map((games) => take(games) ?? take(catalog));
+}
+
 function ProfileStats({ stats: s, reviews }) {
-  // Бібліотека й Wishlist — лише заради обкладинок для фонів карток
-  const lists = useAsync(() => Promise.all([api.library(), api.wishlist()]), [s.totalGames, s.wishlistCount]);
-  const [library = [], wishlist = []] = lists.data ?? [];
-  const cover = (x) => x?.game?.coverUrl ?? null;
-  const topRated = [...(reviews ?? [])].sort((a, b) => b.rating - a.rating)[0];
+  // Бібліотека, Wishlist і каталог — лише заради обкладинок для фонів карток
+  const lists = useAsync(
+    () => Promise.all([api.library(), api.wishlist(), api.games({ limit: 20, sort: 'rating' })]),
+    [s.totalGames, s.wishlistCount],
+  );
+  const [library = [], wishlist = [], catalog] = lists.data ?? [];
+  const covers = pickCovers(
+    [
+      library.map((e) => e.game), // ігор у бібліотеці
+      library.filter((e) => e.status === 'COMPLETED').map((e) => e.game), // пройдено
+      (reviews ?? []).map((r) => r.game), // рецензій
+      [...(reviews ?? [])].sort((a, b) => b.rating - a.rating).map((r) => r.game), // середня оцінка
+      wishlist.map((e) => e.game), // у Wishlist
+    ],
+    catalog?.items ?? [],
+  );
   return (
     <section className="stats">
-      <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={cover(library[0])} />
-      <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED"
-        cover={cover(library.find((e) => e.status === 'COMPLETED'))} />
-      <StatCard value={s.reviewsCount} label="рецензій" cover={cover(reviews?.[0])} />
-      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={cover(topRated)} />
-      <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={cover(wishlist[0])} />
+      <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={covers[0]} />
+      <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED" cover={covers[1]} />
+      <StatCard value={s.reviewsCount} label="рецензій" cover={covers[2]} />
+      <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={covers[3]} />
+      <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={covers[4]} />
     </section>
   );
 }
