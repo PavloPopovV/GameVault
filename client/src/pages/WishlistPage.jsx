@@ -30,7 +30,7 @@ export default function WishlistPage() {
           action={<Link to="/" className="btn btn--primary">До каталогу</Link>} />
       )}
       {wl.data?.length > 0 && (
-        <div className="grid">
+        <div className="grid grid--animated">
           {wl.data.map((item, i) => (
             <GameCard key={item.id} game={item.game} index={i} showRating={false}
               meta={`додано ${formatDate(item.addedAt)}`}

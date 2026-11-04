@@ -48,14 +48,15 @@ export default function LibraryPage() {
         ))}
       </div>
 
-      {lib.loading && <Spinner />}
+      {lib.loading && !lib.data?.length && <Spinner />}
       {lib.error && <ErrorState error={lib.error} onRetry={lib.reload} />}
-      {lib.data?.length === 0 && (
+      {!lib.loading && lib.data?.length === 0 && (
         <EmptyState title={status ? 'Тут поки порожньо' : 'Ваша бібліотека порожня'} text="Знайдіть гру в каталозі й додайте її в бібліотеку."
           action={<Link to="/" className="btn btn--primary">До каталогу</Link>} />
       )}
       {lib.data?.length > 0 && (
-        <div className="grid">
+        // Як у каталозі: старі картки приглушуються, поки вантажиться вкладка, нові з'являються з анімацією
+        <div key={lib.data.map((e) => e.id).join('-')} className={`grid grid--animated ${lib.loading ? 'grid--busy' : ''}`} aria-busy={lib.loading}>
           {lib.data.map((e, i) => (
             <GameCard key={e.id} game={e.game} index={i} showRating={false}
               meta={<>{e.game.releaseYear}{e.status === 'COMPLETED' && e.completedAt && <><br />пройдено {formatDate(e.completedAt)}</>}</>}
