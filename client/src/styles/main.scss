@@ -111,6 +111,7 @@ p { margin: 0; }
 .textarea { height: auto; padding: 12px 14px; resize: vertical; min-height: 96px; }
 .select { cursor: pointer; }
 .select--sm { height: var(--control-h-sm); font-size: 14px; }
+.select--xs { height: var(--control-h-xs); padding: 0 12px; font-size: 13px; border-radius: 8px; }
 
 /* ---------- Dropdown (кастомний select) ---------- */
 .dropdown { position: relative; display: inline-flex; }
@@ -252,6 +253,20 @@ p { margin: 0; }
 .game-card__title { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-card__meta { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+.game-card__footer--actions {
+  flex-wrap: nowrap;
+  .dropdown, .game-card__main-action { flex: 1; min-width: 0; }
+  .dropdown__button { width: 100%; min-width: 0; }
+}
+/* відкритий випадаючий список має бути над сусідніми картками */
+.game-card:has(.dropdown--open) { position: relative; z-index: 5; }
+.btn-icon {
+  flex-shrink: 0; width: var(--control-h-xs); height: var(--control-h-xs); display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  &:hover { color: var(--text); border-color: var(--border-hover); }
+}
+.btn-icon--danger:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.1); }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; }
 .pagination__gap { color: var(--muted); padding: 0 4px; }
 
