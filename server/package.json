@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "covers:rawg": "node src/scripts/fetch-covers-rawg.js"
   },
   "author": "",
   "license": "MIT",
