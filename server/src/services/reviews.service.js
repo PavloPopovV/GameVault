@@ -1,7 +1,7 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { reviews, users } from '../db/schema.js';
-import { canModifyReview } from '../domain/review.js';
+import { libraryEntries, reviews, users } from '../db/schema.js';
+import { canModifyReview, canReviewGame } from '../domain/review.js';
 import { conflict, forbidden, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
 
@@ -30,6 +30,10 @@ export async function createReview(user, gameId, { rating, text }) {
     where: and(eq(reviews.userId, user.id), eq(reviews.gameId, gameId)),
   });
   if (existing) throw conflict('Ви вже залишили рецензію на цю гру');
+  const entry = await db.query.libraryEntries.findFirst({
+    where: and(eq(libraryEntries.userId, user.id), eq(libraryEntries.gameId, gameId)),
+  });
+  if (!canReviewGame(entry)) throw forbidden('Щоб написати рецензію, спочатку додайте гру в бібліотеку');
   const [review] = await db.insert(reviews).values({ userId: user.id, gameId, rating, text: text.trim() }).returning();
   return review;
 }

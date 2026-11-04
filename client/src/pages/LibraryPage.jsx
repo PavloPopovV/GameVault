@@ -28,6 +28,7 @@ export default function LibraryPage() {
   };
 
   const remove = async (entry) => {
+    if (entry.hasReview && !window.confirm(`Разом з «${entry.game.title}» буде видалено вашу рецензію на цю гру. Продовжити?`)) return;
     try {
       await api.removeFromLibrary(entry.gameId);
       lib.setData((list) => list.filter((e) => e.id !== entry.id));

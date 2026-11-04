@@ -1,6 +1,6 @@
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { libraryEntries, wishlistItems } from '../db/schema.js';
+import { libraryEntries, reviews, wishlistItems } from '../db/schema.js';
 import { applyStatusChange } from '../domain/library.js';
 import { conflict, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
@@ -11,11 +11,17 @@ export async function listLibrary(userId, status) {
   const where = status
     ? and(eq(libraryEntries.userId, userId), eq(libraryEntries.status, status))
     : eq(libraryEntries.userId, userId);
-  return db.query.libraryEntries.findMany({
-    where,
-    orderBy: desc(libraryEntries.updatedAt),
-    with: { game: { columns: gameColumns } },
-  });
+  const [entries, myReviews] = await Promise.all([
+    db.query.libraryEntries.findMany({
+      where,
+      orderBy: desc(libraryEntries.updatedAt),
+      with: { game: { columns: gameColumns } },
+    }),
+    db.select({ gameId: reviews.gameId }).from(reviews).where(eq(reviews.userId, userId)),
+  ]);
+  // hasReview — щоб попередити, що разом з грою з бібліотеки зникне й рецензія (GV-21)
+  const reviewed = new Set(myReviews.map((r) => r.gameId));
+  return entries.map((e) => ({ ...e, hasReview: reviewed.has(e.gameId) }));
 }
 
 export async function addToLibrary(userId, gameId, status = 'WANT_TO_PLAY') {
@@ -42,12 +48,16 @@ export async function changeStatus(userId, gameId, status) {
   return updated;
 }
 
+/** Прибирає гру з бібліотеки разом із рецензією на неї: рецензія можлива лише на гру з бібліотеки (GV-21). */
 export async function removeFromLibrary(userId, gameId) {
-  const res = await db
-    .delete(libraryEntries)
-    .where(and(eq(libraryEntries.userId, userId), eq(libraryEntries.gameId, gameId)))
-    .returning({ id: libraryEntries.id });
-  if (!res.length) throw notFound('Гри немає у вашій бібліотеці');
+  await db.transaction(async (tx) => {
+    const res = await tx
+      .delete(libraryEntries)
+      .where(and(eq(libraryEntries.userId, userId), eq(libraryEntries.gameId, gameId)))
+      .returning({ id: libraryEntries.id });
+    if (!res.length) throw notFound('Гри немає у вашій бібліотеці');
+    await tx.delete(reviews).where(and(eq(reviews.userId, userId), eq(reviews.gameId, gameId)));
+  });
 }
 
 // ---- Wishlist ----
