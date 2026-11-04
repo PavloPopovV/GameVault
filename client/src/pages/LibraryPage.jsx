@@ -3,7 +3,8 @@ import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import GameCover from '../components/GameCover.jsx';
+import GameCard from '../components/GameCard.jsx';
+import IconButton from '../components/IconButton.jsx';
 import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
@@ -53,25 +54,21 @@ export default function LibraryPage() {
         <EmptyState title={status ? 'Тут поки порожньо' : 'Ваша бібліотека порожня'} text="Знайдіть гру в каталозі й додайте її в бібліотеку."
           action={<Link to="/" className="btn btn--primary">До каталогу</Link>} />
       )}
-      <ul className="list">
-        {lib.data?.map((e) => (
-          <li key={e.id} className="list-item card">
-            <Link to={`/games/${e.game.slug}`} className="list-item__cover"><GameCover title={e.game.title} coverUrl={e.game.coverUrl} size="sm" /></Link>
-            <div className="list-item__info">
-              <Link to={`/games/${e.game.slug}`} className="list-item__title">{e.game.title}</Link>
-              <span className="muted">
-                {e.game.releaseYear}
-                {e.status === 'COMPLETED' && e.completedAt && ` · пройдено ${formatDate(e.completedAt)}`}
-              </span>
-            </div>
-            <div className="list-item__actions">
-              <Select className="select--status" size="sm" value={e.status} options={STATUSES}
-                onChange={(v) => changeStatus(e, v)} label={`Статус ${e.game.title}`} />
-              <button type="button" className="btn btn--ghost btn--sm btn--danger" onClick={() => remove(e)}>Прибрати</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {lib.data?.length > 0 && (
+        <div className="grid">
+          {lib.data.map((e, i) => (
+            <GameCard key={e.id} game={e.game} index={i} showRating={false}
+              meta={<>{e.game.releaseYear}{e.status === 'COMPLETED' && e.completedAt && <><br />пройдено {formatDate(e.completedAt)}</>}</>}
+              footer={(
+                <>
+                  <Select className="select--status" size="xs" value={e.status} options={STATUSES}
+                    onChange={(v) => changeStatus(e, v)} label={`Статус ${e.game.title}`} />
+                  <IconButton icon="trash" label={`Прибрати «${e.game.title}» з бібліотеки`} onClick={() => remove(e)} danger />
+                </>
+              )} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

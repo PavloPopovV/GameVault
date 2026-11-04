@@ -111,6 +111,7 @@ p { margin: 0; }
 .textarea { height: auto; padding: 12px 14px; resize: vertical; min-height: 96px; }
 .select { cursor: pointer; }
 .select--sm { height: var(--control-h-sm); font-size: 14px; }
+.select--xs { height: var(--control-h-xs); padding: 0 12px; font-size: 13px; border-radius: 8px; }
 
 /* ---------- Dropdown (кастомний select) ---------- */
 .dropdown { position: relative; display: inline-flex; }
@@ -252,6 +253,20 @@ p { margin: 0; }
 .game-card__title { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-card__meta { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .game-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+.game-card__footer--actions {
+  flex-wrap: nowrap;
+  .dropdown, .game-card__main-action { flex: 1; min-width: 0; }
+  .dropdown__button { width: 100%; min-width: 0; }
+}
+/* відкритий випадаючий список має бути над сусідніми картками */
+.game-card:has(.dropdown--open) { position: relative; z-index: 5; }
+.btn-icon {
+  flex-shrink: 0; width: var(--control-h-xs); height: var(--control-h-xs); display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  &:hover { color: var(--text); border-color: var(--border-hover); }
+}
+.btn-icon--danger:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.1); }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; }
 .pagination__gap { color: var(--muted); padding: 0 4px; }
 
@@ -366,6 +381,59 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 .stat__value { font-size: 30px; font-weight: 800; color: #fff; line-height: 1.1; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35); }
 .stat__label { color: rgba(255, 255, 255, 0.85); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 @media (prefers-reduced-motion: reduce) { .stat, .stat__bg { transition: none; } }
-.status-breakdown { padding: 20px; ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-  li { display: grid; grid-template-columns: 120px 1fr 32px; align-items: center; gap: 12px; a:hover { color: var(--accent); } strong { text-align: right; } } }
-.status-breakdown__bar { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; span { display: block; height: 100%; border-radius: 999px; } }
+/* ---------- Прогрес гравця (HP/XP-бари) ---------- */
+.quest-log {
+  position: relative; overflow: hidden; padding: 22px 24px;
+  @media (max-width: $bp-sm) { padding: 18px 16px; }
+  background: radial-gradient(120% 140% at 100% 0%, rgba(242, 96, 12, 0.12), transparent 55%), var(--surface);
+  &::before { /* легкі скан-лінії, як на CRT-екрані */
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.35;
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px);
+  }
+}
+.quest-log__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.quest-log__kicker { display: block; font-family: var(--font-logo); font-size: 9px; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px; }
+.quest-log__title { margin: 0; }
+.quest-log__level { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.quest-log__lvl {
+  font-family: var(--font-logo); font-size: 12px; padding: 8px 10px; border-radius: 6px; color: #fff;
+  background: var(--accent); box-shadow: 0 0 0 2px rgba(242, 96, 12, 0.25), 0 0 18px rgba(242, 96, 12, 0.45);
+}
+.quest-log__xp { font-size: 12px; color: var(--muted); }
+.quest-log__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.quest {
+  --tone: #94a3b8;
+  display: grid; grid-template-columns: 40px 150px 1fr 48px; align-items: center; gap: 14px; padding: 10px 12px;
+  border-radius: 10px; border: 1px solid transparent; transition: background 0.15s, border-color 0.15s;
+  &:hover { background: var(--surface-2); border-color: var(--border); .quest__icon { transform: translateY(-1px) rotate(-6deg); } }
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 40px 1fr 48px; row-gap: 10px; padding: 10px 4px;
+    .quest__count { grid-column: 3; grid-row: 1; }
+    .quest__bar { grid-column: 1 / -1; grid-row: 2; }
+  }
+}
+.quest--want { --tone: #94a3b8; }
+.quest--playing { --tone: var(--accent-2); }
+.quest--completed { --tone: var(--success); }
+.quest--dropped { --tone: var(--danger); }
+.quest__icon {
+  width: 40px; height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 35%, transparent); transition: transform 0.2s var(--ease-out);
+}
+.quest__text { display: flex; flex-direction: column; min-width: 0; }
+.quest__label { font-weight: 700; }
+.quest__hint { font-size: 12px; color: var(--muted); }
+.quest__bar {
+  display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; height: 14px; padding: 3px;
+  border-radius: 4px; background: #070708; box-shadow: inset 0 0 0 1px var(--border);
+  i { border-radius: 1px; background: rgba(255, 255, 255, 0.05); }
+  i.is-on {
+    background: var(--tone); box-shadow: 0 0 6px color-mix(in srgb, var(--tone) 70%, transparent);
+    animation: segment-on 0.25s var(--ease-out) both; animation-delay: var(--d);
+  }
+}
+@keyframes segment-on { from { opacity: 0; transform: scaleY(0.3); } }
+.quest__count { font-family: var(--font-logo); font-size: 12px; text-align: right; color: var(--tone); }
+.quest--empty { .quest__count, .quest__label { opacity: 0.55; } .quest__icon { filter: grayscale(1); opacity: 0.6; } }
+@media (prefers-reduced-motion: reduce) { .quest__bar i.is-on { animation: none; } .quest__icon { transition: none; } }
