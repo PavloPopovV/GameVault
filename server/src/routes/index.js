@@ -53,8 +53,9 @@ r.get(
 );
 r.get(
   '/games',
+  optionalAuth,
   validate(S.listGamesQuery, 'query'),
-  h(async (req, res) => res.json(await gamesSvc.listGames(req.query))),
+  h(async (req, res) => res.json(await gamesSvc.listGames(req.query, req.user))),
 );
 r.get(
   '/games/:idOrSlug',

@@ -86,6 +86,17 @@ describe('Catalog + Library + Reviews API', () => {
     expect(me.body.stats.byStatus.COMPLETED).toBe(1);
   });
 
+  it('GV-19: каталог повертає статус гри в бібліотеці користувача', async () => {
+    const token = await registerUser('dave');
+    const auth = { Authorization: `Bearer ${token}` };
+    // гість і користувач без гри в бібліотеці — статусу немає
+    expect((await api('get', '/games')).body.items[0].libraryStatus).toBeUndefined();
+    expect((await api('get', '/games').set(auth)).body.items[0].libraryStatus).toBeNull();
+    // після додавання статус приходить у списку — стан не губиться після перезавантаження сторінки
+    await api('post', '/library').set(auth).send({ gameId, status: 'PLAYING' });
+    expect((await api('get', '/games').set(auth)).body.items[0].libraryStatus).toBe('PLAYING');
+  });
+
   it('рецензія: валідація 400, створення, середня оцінка, чужа рецензія 403', async () => {
     const t1 = await registerUser('carol');
     const t2 = await registerUser('dave');

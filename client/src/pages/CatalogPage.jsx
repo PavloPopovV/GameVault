@@ -8,7 +8,7 @@ import Select from '../components/Select.jsx';
 import GameCard from '../components/GameCard.jsx';
 import Pagination from '../components/Pagination.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
-import { pluralUk } from '../utils/constants.js';
+import { STATUSES, pluralUk } from '../utils/constants.js';
 
 const PAGE_SIZE = 8; // карток на сторінці каталогу (2 ряди по 4)
 
@@ -18,11 +18,23 @@ const SORTS = [
   { value: 'title', label: 'За назвою' },
 ];
 
+// Гра вже в бібліотеці: замість кнопки — її статус, як на сторінці бібліотеки (клік веде туди)
+function LibraryBadge({ status }) {
+  const s = STATUSES.find((x) => x.value === status);
+  return (
+    <Link to={`/library?status=${status}`} className="badge badge--status" title="Відкрити в бібліотеці">
+      <span className={`dot status--${s.tone}`} aria-hidden="true" />
+      {s.label}
+    </Link>
+  );
+}
+
 export default function CatalogPage() {
   const [params, setParams] = useSearchParams();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const toast = useToast();
-  const [added, setAdded] = useState(() => new Set());
+  // Статуси, змінені на цій сторінці (поверх libraryStatus, який приходить з API)
+  const [added, setAdded] = useState(() => new Map());
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const q = params.get('q') || '';
@@ -32,7 +44,7 @@ export default function CatalogPage() {
   const page = Number(params.get('page')) || 1;
 
   const taxonomy = useAsync(() => Promise.all([api.genres(), api.platforms()]), []);
-  const list = useAsync(() => api.games({ q, genre, platform, sort, page, limit: PAGE_SIZE }), [q, genre, platform, sort, page]);
+  const list = useAsync(() => api.games({ q, genre, platform, sort, page, limit: PAGE_SIZE }), [q, genre, platform, sort, page, user?.id]);
 
   const update = (patch) => {
     const next = new URLSearchParams(params);
@@ -44,12 +56,12 @@ export default function CatalogPage() {
   const addToLibrary = async (game) => {
     try {
       await api.addToLibrary(game.id, 'WANT_TO_PLAY');
-      setAdded((s) => new Set(s).add(game.id));
+      setAdded((s) => new Map(s).set(game.id, 'WANT_TO_PLAY'));
       toast.success(`«${game.title}» додано в бібліотеку`);
     } catch (err) {
       if (err.status === 409) {
-        // Гра вже в бібліотеці — це не помилка, просто синхронізуємо картку
-        setAdded((s) => new Set(s).add(game.id));
+        // Гра вже в бібліотеці (напр., додана в іншій вкладці) — підтягуємо актуальний статус
+        list.reload();
         toast.info(`«${game.title}» вже є у вашій бібліотеці`);
       } else {
         toast.error(err.message);
@@ -116,8 +128,8 @@ export default function CatalogPage() {
               {list.data.items.map((game, i) => (
                 <GameCard key={game.id} game={game} index={i} footer={
                   isAuthenticated ? (
-                    added.has(game.id)
-                      ? <span className="badge badge--success">✓ У бібліотеці</span>
+                    (added.get(game.id) ?? game.libraryStatus)
+                      ? <LibraryBadge status={added.get(game.id) ?? game.libraryStatus} />
                       : <button type="button" className="btn btn--outline btn--xs" onClick={() => addToLibrary(game)}>+ У бібліотеку</button>
                   ) : <Link to="/login" className="btn btn--outline btn--xs">+ У бібліотеку</Link>
                 } />

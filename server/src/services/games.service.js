@@ -40,7 +40,18 @@ async function attachTaxonomy(rows) {
   }));
 }
 
-export async function listGames({ q, genre, platform, sort = 'rating', page = 1, limit = 20 }) {
+/** Для авторизованого користувача додає до кожної гри її статус у його бібліотеці (або null). */
+async function attachLibraryStatus(rows, user) {
+  if (!user || rows.length === 0) return rows;
+  const entries = await db
+    .select({ gameId: libraryEntries.gameId, status: libraryEntries.status })
+    .from(libraryEntries)
+    .where(and(eq(libraryEntries.userId, user.id), inArray(libraryEntries.gameId, rows.map((r) => r.id))));
+  const byGame = new Map(entries.map((e) => [e.gameId, e.status]));
+  return rows.map((r) => ({ ...r, libraryStatus: byGame.get(r.id) ?? null }));
+}
+
+export async function listGames({ q, genre, platform, sort = 'rating', page = 1, limit = 20 }, user = null) {
   const filters = [];
   if (q) filters.push(ilike(games.title, `%${q}%`));
   if (genre) {
@@ -85,7 +96,7 @@ export async function listGames({ q, genre, platform, sort = 'rating', page = 1,
   ]);
 
   return {
-    items: await attachTaxonomy(rows),
+    items: await attachLibraryStatus(await attachTaxonomy(rows), user),
     pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
   };
 }
