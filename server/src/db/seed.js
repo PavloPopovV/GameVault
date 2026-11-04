@@ -193,7 +193,39 @@ const GAMES = [
   ],
 ];
 
+// Steam App ID для обкладинок (вертикальні 600x900 з офіційного CDN Steam).
+// Ігор, яких немає в Steam, тут немає — для них обкладинку можна підтягнути з RAWG: npm run covers:rawg
+const STEAM_APP_IDS = {
+  'The Witcher 3: Wild Hunt': 292030,
+  'Elden Ring': 1245620,
+  Hades: 1145360,
+  'Cyberpunk 2077': 1091500,
+  'Stardew Valley': 413150,
+  'Doom Eternal': 782330,
+  'Hollow Knight': 367520,
+  'Civilization VI': 289070,
+  'Red Dead Redemption 2': 1174180,
+  "Baldur's Gate 3": 1086940,
+  Celeste: 504230,
+  'Portal 2': 620,
+  'Disco Elysium': 632470,
+  'Dead Cells': 588650,
+  'XCOM 2': 268500,
+  'God of War Ragnarök': 2322010,
+  'S.T.A.L.K.E.R. 2: Heart of Chornobyl': 1643320,
+  Factorio: 427520,
+};
+const steamCover = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`;
+
 async function main() {
+  // --if-empty: безпечний режим для деплою — не чіпає БД, якщо дані вже є
+  if (process.argv.includes('--if-empty')) {
+    const [{ count }] = await db.select({ count: sql`count(*)`.mapWith(Number) }).from(games);
+    if (count > 0) {
+      console.log(`Seed пропущено: у БД вже є ${count} ігор.`);
+      return;
+    }
+  }
   console.log('Seeding…');
   await db.execute(sql`TRUNCATE ${reviews}, ${wishlistItems}, ${libraryEntries}, ${gameGenres}, ${gamePlatforms},
     ${games}, ${genres}, ${platforms}, ${profiles}, ${users} RESTART IDENTITY CASCADE`);
@@ -218,6 +250,7 @@ async function main() {
         releaseYear,
         developer,
         description,
+        coverUrl: STEAM_APP_IDS[title] ? steamCover(STEAM_APP_IDS[title]) : null,
       })),
     )
     .returning();
