@@ -126,7 +126,7 @@ p { margin: 0; }
 .select.status--dropped { border-left-color: var(--danger); }
 
 /* ---------- Cover ---------- */
-.cover { width: 100%; aspect-ratio: 3 / 4; border-radius: var(--radius-sm); object-fit: cover; }
+.cover { width: 100%; aspect-ratio: 2 / 3; border-radius: var(--radius-sm); object-fit: cover; background: var(--surface-2); }
 .cover--generated { display: flex; align-items: center; justify-content: center; }
 .cover__initials { font-size: 34px; font-weight: 800; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.04em; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
 .cover--sm { width: 56px; .cover__initials { font-size: 16px; } }
