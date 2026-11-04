@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
 export default function ProfilePage() {
-  const { user, refresh } = useAuth();
+  const { user, refresh, logout } = useAuth();
+  const navigate = useNavigate();
+  const onLogout = () => { logout(); navigate('/', { replace: true }); };
   const toast = useToast();
   const [form, setForm] = useState({ username: user.username, bio: user.profile.bio ?? '' });
   const [busy, setBusy] = useState(false);
@@ -30,6 +32,7 @@ export default function ProfilePage() {
           <h1 className="page-title">{user.username}</h1>
           <p className="muted">{user.email} · з нами з {formatDate(user.createdAt)}</p>
         </div>
+        <button type="button" className="btn btn--secondary btn--sm profile__logout" onClick={onLogout}>Вийти з акаунту</button>
       </header>
 
       <section className="stats">

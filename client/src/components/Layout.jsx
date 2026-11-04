@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Layout() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [params] = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,7 +26,6 @@ export default function Layout() {
     navigate(`/?${next}`);
   };
 
-  const onLogout = () => { logout(); navigate('/'); };
 
   return (
     <div className="app">
@@ -57,13 +56,10 @@ export default function Layout() {
               </>
             )}
             {isAuthenticated ? (
-              <div className="nav__user">
-                <NavLink to="/profile" className="nav__link nav__profile">
-                  <span className="avatar" aria-hidden="true">{user.username[0].toUpperCase()}</span>
-                  {user.username}
-                </NavLink>
-                <button type="button" className="btn btn--ghost btn--sm" onClick={onLogout}>Вийти</button>
-              </div>
+              <NavLink to="/profile" className="nav__link nav__profile" aria-label={`Профіль ${user.username}`} title="Мій профіль">
+                <span className="avatar" aria-hidden="true">{user.username[0].toUpperCase()}</span>
+                <span className="nav__profile-label" aria-hidden="true">Мій профіль</span>
+              </NavLink>
             ) : (
               <Link to="/login" className="btn btn--primary btn--sm">Увійти</Link>
             )}
