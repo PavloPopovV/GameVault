@@ -8,7 +8,7 @@
     "dev:live": "vite --mode live",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
     "@fontsource/press-start-2p": "^5.2.5",
