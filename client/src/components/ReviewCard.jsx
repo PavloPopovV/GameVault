@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ActionsMenu from './ActionsMenu.jsx';
-import Ambient from './Ambient.jsx';
 import Modal from './Modal.jsx';
 import ReviewForm from './ReviewForm.jsx';
 import { formatDate } from '../utils/constants.js';
@@ -10,7 +9,7 @@ import { formatDate } from '../utils/constants.js';
  * зліва фото (аватар автора або обкладинка гри), поруч назва + оцінка, нижче текст, ще нижче дата.
  * Якщо передано onUpdate / onDelete — праворуч меню «⋯» з «Редагувати» і «Видалити» (модалки).
  */
-export default function ReviewCard({ review, media, title, mine = false, clamp = false, ambient, onUpdate, onDelete }) {
+export default function ReviewCard({ review, media, title, mine = false, clamp = false, onUpdate, onDelete }) {
   const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | null
   const [busy, setBusy] = useState(false);
   const close = () => setDialog(null);
@@ -23,8 +22,7 @@ export default function ReviewCard({ review, media, title, mine = false, clamp =
   };
 
   return (
-    <article className={`review-card card glass ${mine ? 'review-card--mine' : ''}`}>
-      <Ambient image={ambient} />
+    <article className={`review-card card ${mine ? 'review-card--mine' : ''}`}>
       <div className="review-card__media">{media}</div>
       <div className="review-card__body">
         <div className="review-card__head">

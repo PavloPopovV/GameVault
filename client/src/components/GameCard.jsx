@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import GameCover from './GameCover.jsx';
-import Ambient from './Ambient.jsx';
 
 /**
  * Картка гри (каталог, бібліотека, Wishlist).
@@ -10,8 +9,7 @@ import Ambient from './Ambient.jsx';
 export default function GameCard({ game, footer, index = 0, meta, showRating = true }) {
   const defaultMeta = [game.releaseYear, game.genres?.slice(0, 2).join(', ')].filter(Boolean).join(' · ');
   return (
-    <article className="game-card glass" style={{ '--i': index }}>
-      <Ambient image={game.coverUrl} />
+    <article className="game-card" style={{ '--i': index }}>
       <Link to={`/games/${game.slug}`} className="game-card__link">
         <GameCover title={game.title} coverUrl={game.coverUrl} />
         <div className="game-card__body">

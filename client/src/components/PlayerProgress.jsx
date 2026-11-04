@@ -95,7 +95,7 @@ export default function PlayerProgress({ stats: s }) {
   const total = s.totalGames || 0;
   const completed = s.byStatus.COMPLETED ?? 0;
   return (
-    <section className="card glass quest-log">
+    <section className="card quest-log">
       <header className="quest-log__head">
         <h2 className="section-title quest-log__title">Прогрес гравця</h2>
         <span className="quest-log__lvl" title={`Рівень = кількість пройдених ігор (${completed} з ${total})`}>LVL {completed}</span>
