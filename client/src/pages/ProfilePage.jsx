@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -7,6 +7,8 @@ import { useAsync } from '../hooks/useAsync.js';
 import GameCover from '../components/GameCover.jsx';
 import Modal from '../components/Modal.jsx';
 import ActionsMenu from '../components/ActionsMenu.jsx';
+import Avatar from '../components/Avatar.jsx';
+import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
@@ -118,6 +120,31 @@ function DeleteAccountForm({ onCancel }) {
   );
 }
 
+function AvatarPreview({ image, onDone }) {
+  const { refresh } = useAuth();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    try {
+      await api.uploadAvatar(image);
+      await refresh();
+      toast.success('Фото профілю оновлено');
+      onDone();
+    } catch (err) { toast.error(err.message); setBusy(false); }
+  };
+  return (
+    <div className="form">
+      <div className="avatar-preview"><img src={image} alt="Попередній перегляд нового фото" /></div>
+      <p className="muted avatar-preview__hint">Фото обрізано до квадрата по центру.</p>
+      <div className="modal__actions">
+        <button type="button" className="btn btn--ghost" onClick={onDone}>Скасувати</button>
+        <button type="button" className="btn btn--primary" onClick={save} disabled={busy}>{busy ? 'Зберігаємо…' : 'Зберегти фото'}</button>
+      </div>
+    </div>
+  );
+}
+
 function MyReviews({ count }) {
   const list = useAsync(() => api.myReviews(), [count]);
   return (
@@ -151,9 +178,22 @@ function MyReviews({ count }) {
 }
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
   const navigate = useNavigate();
-  const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | null
+  const toast = useToast();
+  const fileRef = useRef(null);
+  const [dialog, setDialog] = useState(null); // 'edit' | 'delete' | 'avatar' | null
+  const [newAvatar, setNewAvatar] = useState(null);
+  const pickPhoto = () => fileRef.current?.click();
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // щоб повторний вибір того самого файлу теж спрацював
+    if (!file) return;
+    try { setNewAvatar(await prepareAvatar(file)); setDialog('avatar'); } catch (err) { toast.error(err.message); }
+  };
+  const removePhoto = async () => {
+    try { await api.removeAvatar(); await refresh(); toast.success('Фото профілю видалено'); } catch (err) { toast.error(err.message); }
+  };
   const onLogout = () => { logout(); navigate('/', { replace: true }); };
   const closeDialog = () => setDialog(null);
   const s = user.stats;
@@ -162,7 +202,13 @@ export default function ProfilePage() {
   return (
     <div className="profile">
       <header className="profile__head">
-        <span className="avatar avatar--lg" aria-hidden="true">{user.username[0].toUpperCase()}</span>
+        <button type="button" className="profile__avatar" onClick={pickPhoto} aria-label={user.avatarUrl ? 'Змінити фото профілю' : 'Додати фото профілю'}>
+          <Avatar name={user.username} avatarUrl={user.avatarUrl} size="lg" />
+          <span className="profile__avatar-overlay" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+          </span>
+        </button>
+        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onFile} />
         <div className="profile__info">
           <h1 className="page-title">{user.username}</h1>
           {bio ? <p className="profile__bio">{bio}</p> : <p className="profile__bio profile__bio--empty">Розкажіть, у які ігри любите грати</p>}
@@ -171,6 +217,8 @@ export default function ProfilePage() {
         <div className="profile__actions">
           <ActionsMenu label="Дії з акаунтом" items={[
             { label: 'Редагувати профіль', onSelect: () => setDialog('edit') },
+            { label: user.avatarUrl ? 'Змінити фото' : 'Додати фото', onSelect: pickPhoto },
+            ...(user.avatarUrl ? [{ label: 'Видалити фото', onSelect: removePhoto }] : []),
             { label: 'Вийти з акаунту', onSelect: onLogout },
             { label: 'Видалити акаунт', onSelect: () => setDialog('delete'), danger: true, divider: true },
           ]} />
@@ -202,6 +250,9 @@ export default function ProfilePage() {
 
       <Modal open={dialog === 'edit'} title="Редагувати профіль" onClose={closeDialog}>
         <EditProfileForm user={user} onDone={closeDialog} />
+      </Modal>
+      <Modal open={dialog === 'avatar' && Boolean(newAvatar)} title="Нове фото профілю" onClose={closeDialog}>
+        <AvatarPreview image={newAvatar} onDone={closeDialog} />
       </Modal>
       <Modal open={dialog === 'delete'} title="Видалити акаунт?" onClose={closeDialog}>
         <DeleteAccountForm onCancel={closeDialog} />
