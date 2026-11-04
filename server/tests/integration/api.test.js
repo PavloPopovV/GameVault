@@ -48,6 +48,7 @@ describe('Auth API', () => {
       password: 'Secret123',
     });
     expect(dup.status).toBe(409);
+    expect(dup.body.details).toEqual([{ field: 'email', message: 'Цей Email вже зайнятий' }]);
   });
 
   it('логін з невірним паролем → 401; з вірним → 200', async () => {

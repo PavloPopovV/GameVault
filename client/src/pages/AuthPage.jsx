@@ -35,7 +35,10 @@ export default function AuthPage({ mode }) {
       navigate(location.state?.from || '/', { replace: true });
     } catch (err) {
       toast.error(err.message);
-      if (err.status === 409) setErrors({ email: err.message.includes('Email') ? err.message : undefined, username: err.message.includes('нікнейм') ? err.message : undefined });
+      // Бекенд повертає поле, до якого належить помилка: details: [{ field, message }]
+      if (err.details?.length) {
+        setErrors(Object.fromEntries(err.details.map((d) => [d.field, d.message])));
+      }
     } finally {
       setSubmitting(false);
     }
