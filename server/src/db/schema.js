@@ -15,7 +15,10 @@ import {
   uniqueIndex,
   index,
   check,
+  customType,
 } from 'drizzle-orm/pg-core';
+
+const bytea = customType({ dataType: () => 'bytea' });
 
 export const roleEnum = pgEnum('role', ['USER', 'ADMIN']);
 export const libraryStatusEnum = pgEnum('library_status', ['WANT_TO_PLAY', 'PLAYING', 'COMPLETED', 'DROPPED']);
@@ -43,6 +46,10 @@ export const profiles = pgTable('profiles', {
     .unique()
     .references(() => users.id, { onDelete: 'cascade' }),
   bio: varchar('bio', { length: 200 }),
+  // Фото профілю (≤ 200 КБ, вже стиснуте клієнтом) — у БД, бо диск Render тимчасовий
+  avatar: bytea('avatar'),
+  avatarMime: varchar('avatar_mime', { length: 20 }),
+  avatarUpdatedAt: timestamp('avatar_updated_at', { withTimezone: true }),
   updatedAt: updatedAt(),
 });
 

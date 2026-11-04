@@ -293,7 +293,10 @@ async function main() {
     { userId: player.id, gameId: byTitle["Baldur's Gate 3"], status: 'WANT_TO_PLAY' },
     // Рецензію можна написати лише на гру з бібліотеки (GV-21)
     ...['The Witcher 3: Wild Hunt', 'Hades', 'Elden Ring', 'Hollow Knight'].map((t) => ({
-      userId: demo.id, gameId: byTitle[t], status: 'COMPLETED', completedAt: now,
+      userId: demo.id,
+      gameId: byTitle[t],
+      status: 'COMPLETED',
+      completedAt: now,
     })),
     { userId: admin.id, gameId: byTitle['Stardew Valley'], status: 'PLAYING' },
   ]);

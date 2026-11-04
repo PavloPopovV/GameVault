@@ -71,6 +71,8 @@ export const updateReviewSchema = z
   .object({ rating: rating.optional(), text: reviewText.optional() })
   .refine((o) => o.rating !== undefined || o.text !== undefined, 'Немає полів для оновлення');
 
+export const avatarSchema = z.object({ image: z.string().max(300_000, 'Фото завелике') });
+
 export const deleteAccountSchema = z.object({
   password: z.string().min(1, 'Введіть пароль').max(72),
 });
