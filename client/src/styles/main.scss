@@ -548,3 +548,16 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   &::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 35%); }
 }
 @media (max-width: $bp-md) { .filters.liquid { background: var(--surface); } }
+
+/* Статуси на картках ігор (бейдж у каталозі, вибір статусу в бібліотеці) і кнопка-кошик — прозоре скло */
+.game-card .badge--status,
+.game-card .dropdown__button,
+.game-card .btn-icon {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  &:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.28); }
+}
+.game-card .dropdown--open .dropdown__button { border-color: var(--accent); }

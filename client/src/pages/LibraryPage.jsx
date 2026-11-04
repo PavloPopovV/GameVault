@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
@@ -6,6 +7,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import GameCard from '../components/GameCard.jsx';
 import IconButton from '../components/IconButton.jsx';
 import Select from '../components/Select.jsx';
+import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
@@ -39,14 +41,16 @@ export default function LibraryPage() {
     } catch (err) { toast.error(err.message); }
   };
 
-  const remove = async (entry) => {
-    if (entry.hasReview && !window.confirm(`Разом з «${entry.game.title}» буде видалено вашу рецензію на цю гру. Продовжити?`)) return;
+  const [pending, setPending] = useState(null); // гра з рецензією, яку прибираємо — чекає підтвердження
+  const doRemove = async (entry) => {
     try {
       await api.removeFromLibrary(entry.gameId);
       lib.setData((list) => list.filter((e) => e.id !== entry.id));
       toast.success(`«${entry.game.title}» прибрано з бібліотеки`);
-    } catch (err) { toast.error(err.message); }
+    } catch (err) { toast.error(err.message); throw err; }
   };
+  // Рецензія можлива лише на гру з бібліотеки (GV-21) — тож спершу попереджаємо в модалці
+  const remove = (entry) => (entry.hasReview ? setPending(entry) : doRemove(entry).catch(() => {}));
 
   return (
     <div>
@@ -81,6 +85,10 @@ export default function LibraryPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog open={Boolean(pending)} title="Прибрати гру з бібліотеки?" confirmLabel="Прибрати" danger
+        onConfirm={() => doRemove(pending)} onClose={() => setPending(null)}>
+        Разом з «{pending?.game.title}» буде видалено вашу рецензію на цю гру. Цю дію <b>не можна скасувати</b>.
+      </ConfirmDialog>
     </div>
   );
 }
