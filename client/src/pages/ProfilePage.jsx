@@ -10,8 +10,6 @@ import ActionsMenu from '../components/ActionsMenu.jsx';
 import Avatar from '../components/Avatar.jsx';
 import PlayerProgress from '../components/PlayerProgress.jsx';
 import ReviewCard from '../components/ReviewCard.jsx';
-import PageBackdrop from '../components/PageBackdrop.jsx';
-import { heroUrl } from '../utils/hero.js';
 import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
@@ -264,12 +262,9 @@ export default function ProfilePage() {
   const s = user.stats;
   const reviews = useAsync(() => api.myReviews(), [s.reviewsCount]);
   const bio = user.profile.bio?.trim();
-  // Фон профілю — арт гри з найвищою оцінкою користувача
-  const favorite = [...(reviews.data ?? [])].sort((a, b) => b.rating - a.rating)[0];
 
   return (
     <div className="profile">
-      <PageBackdrop image={heroUrl(favorite?.game.coverUrl)} />
       <header className="profile__head">
         <button type="button" className="profile__avatar" onClick={pickPhoto} aria-label={user.avatarUrl ? 'Змінити фото профілю' : 'Додати фото профілю'}>
           <Avatar name={user.username} avatarUrl={user.avatarUrl} size="lg" />
