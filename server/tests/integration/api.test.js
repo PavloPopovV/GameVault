@@ -89,8 +89,8 @@ describe('Catalog + Library + Reviews API', () => {
   it('GV-19: каталог повертає статус гри в бібліотеці користувача', async () => {
     const token = await registerUser('erin');
     const auth = { Authorization: `Bearer ${token}` };
-    // гість і користувач без гри в бібліотеці — статусу немає
-    expect((await api('get', '/games')).body.items[0].libraryStatus).toBeUndefined();
+    // гість і користувач без гри в бібліотеці — однаковий контракт: libraryStatus = null
+    expect((await api('get', '/games')).body.items[0].libraryStatus).toBeNull();
     expect((await api('get', '/games').set(auth)).body.items[0].libraryStatus).toBeNull();
     // після додавання статус приходить у списку — стан не губиться після перезавантаження сторінки
     await api('post', '/library').set(auth).send({ gameId, status: 'PLAYING' });

@@ -40,9 +40,9 @@ async function attachTaxonomy(rows) {
   }));
 }
 
-/** Для авторизованого користувача додає до кожної гри її статус у його бібліотеці (або null). */
+/** Додає до кожної гри її статус у бібліотеці користувача; для гостя або гри поза бібліотекою — null. */
 async function attachLibraryStatus(rows, user) {
-  if (!user || rows.length === 0) return rows;
+  if (!user || rows.length === 0) return rows.map((r) => ({ ...r, libraryStatus: null }));
   const entries = await db
     .select({ gameId: libraryEntries.gameId, status: libraryEntries.status })
     .from(libraryEntries)
