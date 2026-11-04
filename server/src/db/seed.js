@@ -128,20 +128,20 @@ const GAMES = [
     'Головоломки з порталами, кооператив і саркастичний штучний інтелект GLaDOS.',
   ],
   [
-    'Minecraft',
+    'Terraria',
     2011,
-    'Mojang Studios',
-    ['Simulation', 'Adventure', 'Open World'],
+    'Re-Logic',
+    ['Adventure', 'Indie', 'Platformer'],
     ['PC', 'PlayStation', 'Xbox', 'Nintendo Switch'],
-    'Пісочниця з кубиків: виживання, будівництво та безмежні світи.',
+    'Пісочниця-виживання у 2D: копайте, будуйте, крафтіть спорядження та перемагайте босів.',
   ],
   [
-    'The Legend of Zelda: Tears of the Kingdom',
-    2023,
-    'Nintendo',
-    ['Adventure', 'Action', 'Open World'],
-    ['Nintendo Switch'],
-    'Лінк досліджує небесні острови й глибини Хайрула, будуючи власні механізми.',
+    'Sekiro: Shadows Die Twice',
+    2019,
+    'FromSoftware',
+    ['Action', 'Adventure'],
+    ['PC', 'PlayStation', 'Xbox'],
+    'Шінобі Вовк мститься за свого пана в Японії епохи Сенґоку; бої на мечах, де вирішує кожне парирування.',
   ],
   [
     'Disco Elysium',
@@ -194,7 +194,7 @@ const GAMES = [
 ];
 
 // Steam App ID для обкладинок (вертикальні 600x900 з офіційного CDN Steam).
-// Ігор, яких немає в Steam, тут немає — для них обкладинку можна підтягнути з RAWG: npm run covers:rawg
+// Для ігор поза Steam обкладинку можна підтягнути з RAWG: npm run covers:rawg
 const STEAM_APP_IDS = {
   'The Witcher 3: Wild Hunt': 292030,
   'Elden Ring': 1245620,
@@ -214,6 +214,8 @@ const STEAM_APP_IDS = {
   'God of War Ragnarök': 2322010,
   'S.T.A.L.K.E.R. 2: Heart of Chornobyl': 1643320,
   Factorio: 427520,
+  Terraria: 105600,
+  'Sekiro: Shadows Die Twice': 814380,
 };
 const steamCover = (appId) => `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`;
 
