@@ -250,3 +250,33 @@ describe('Avatar API', () => {
     expect((await request(app).get(url)).status).toBe(404);
   });
 });
+
+describe('Review votes API', () => {
+  it('👍/👎: лічильники, перемикання, зняття, гість бачить суми, за свою — 403', async () => {
+    const tAuthor = await registerUser('leo');
+    const tVoter = await registerUser('mia');
+    const author = { Authorization: `Bearer ${tAuthor}` };
+    const voter = { Authorization: `Bearer ${tVoter}` };
+    await api('post', '/library').set(author).send({ gameId });
+    const { body: review } = await api('post', `/games/${gameId}/reviews`)
+      .set(author)
+      .send({ rating: 7, text: 'Рецензія для голосів' });
+
+    expect((await api('put', `/reviews/${review.id}/vote`).set(author).send({ value: 1 })).status).toBe(403);
+    expect((await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 5 })).status).toBe(400);
+    expect((await api('put', `/reviews/${review.id}/vote`).send({ value: 1 })).status).toBe(401);
+
+    const like = await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 1 });
+    expect(like.body).toMatchObject({ likes: 1, dislikes: 0, myVote: 1 });
+    const dislike = await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: -1 });
+    expect(dislike.body).toMatchObject({ likes: 0, dislikes: 1, myVote: -1 });
+
+    const asGuest = (await api('get', `/games/${gameId}/reviews`)).body.find((r) => r.id === review.id);
+    expect(asGuest).toMatchObject({ likes: 0, dislikes: 1, myVote: 0 });
+    const asVoter = (await api('get', `/games/${gameId}/reviews`).set(voter)).body.find((r) => r.id === review.id);
+    expect(asVoter.myVote).toBe(-1);
+
+    const off = await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 0 });
+    expect(off.body).toMatchObject({ likes: 0, dislikes: 0, myVote: 0 });
+  });
+});

@@ -1,12 +1,61 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { libraryEntries, profiles, reviews, users } from '../db/schema.js';
+import { libraryEntries, profiles, reviewVotes, reviews, users } from '../db/schema.js';
 import { avatarPath } from '../domain/avatar.js';
-import { canModifyReview, canReviewGame } from '../domain/review.js';
-import { conflict, forbidden, notFound } from '../utils/errors.js';
+import { canModifyReview, canReviewGame, validateVote } from '../domain/review.js';
+import { badRequest, conflict, forbidden, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
 
-export async function listGameReviews(gameId, { page = 1, limit = 20 } = {}) {
+/** Додає до рецензій кількість 👍 / 👎 і голос поточного користувача (myVote: 1, -1 або 0). */
+export async function attachVotes(rows, user = null) {
+  if (rows.length === 0) return rows;
+  const ids = rows.map((r) => r.id);
+  const [totals, mine] = await Promise.all([
+    db
+      .select({
+        reviewId: reviewVotes.reviewId,
+        likes: sql`count(*) filter (where ${reviewVotes.value} = 1)`.mapWith(Number),
+        dislikes: sql`count(*) filter (where ${reviewVotes.value} = -1)`.mapWith(Number),
+      })
+      .from(reviewVotes)
+      .where(inArray(reviewVotes.reviewId, ids))
+      .groupBy(reviewVotes.reviewId),
+    user
+      ? db
+          .select({ reviewId: reviewVotes.reviewId, value: reviewVotes.value })
+          .from(reviewVotes)
+          .where(and(eq(reviewVotes.userId, user.id), inArray(reviewVotes.reviewId, ids)))
+      : [],
+  ]);
+  const byId = new Map(totals.map((t) => [t.reviewId, t]));
+  const myById = new Map(mine.map((m) => [m.reviewId, m.value]));
+  return rows.map((r) => ({
+    ...r,
+    likes: byId.get(r.id)?.likes ?? 0,
+    dislikes: byId.get(r.id)?.dislikes ?? 0,
+    myVote: myById.get(r.id) ?? 0,
+  }));
+}
+
+/** 👍 / 👎 за чужу рецензію; value = 0 знімає голос. Повертає оновлені лічильники. */
+export async function voteReview(user, reviewId, value) {
+  const review = await db.query.reviews.findFirst({ where: eq(reviews.id, reviewId) });
+  if (!review) throw notFound('Рецензію не знайдено');
+  const error = validateVote(review, user, value);
+  if (error) throw review.userId === user.id ? forbidden(error) : badRequest(error);
+  if (value === 0) {
+    await db.delete(reviewVotes).where(and(eq(reviewVotes.reviewId, reviewId), eq(reviewVotes.userId, user.id)));
+  } else {
+    await db
+      .insert(reviewVotes)
+      .values({ reviewId, userId: user.id, value })
+      .onConflictDoUpdate({ target: [reviewVotes.reviewId, reviewVotes.userId], set: { value } });
+  }
+  const [withVotes] = await attachVotes([{ id: reviewId }], user);
+  return withVotes;
+}
+
+export async function listGameReviews(gameId, { page = 1, limit = 20 } = {}, user = null) {
   await ensureGameExists(gameId);
   const rows = await db
     .select({
@@ -25,10 +74,13 @@ export async function listGameReviews(gameId, { page = 1, limit = 20 } = {}) {
     .orderBy(desc(reviews.createdAt))
     .limit(limit)
     .offset((page - 1) * limit);
-  return rows.map(({ avatarUpdatedAt, author, ...r }) => ({
-    ...r,
-    author: { ...author, avatarUrl: avatarPath(author.id, avatarUpdatedAt) },
-  }));
+  return attachVotes(
+    rows.map(({ avatarUpdatedAt, author, ...r }) => ({
+      ...r,
+      author: { ...author, avatarUrl: avatarPath(author.id, avatarUpdatedAt) },
+    })),
+    user,
+  );
 }
 
 export async function createReview(user, gameId, { rating, text }) {

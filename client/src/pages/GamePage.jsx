@@ -140,6 +140,7 @@ export default function GamePage() {
             <ReviewCard key={r.id} review={r} mine={mine}
               media={<Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} size="lg" />}
               title={r.author.username}
+              onVote={isAuthenticated ? (v) => api.voteReview(r.id, v) : () => { requireLogin(); return null; }}
               onUpdate={mine ? updateReview : undefined}
               onDelete={mine ? deleteReview : undefined} />
           );

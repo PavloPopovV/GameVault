@@ -92,4 +92,5 @@ export const api = {
   createReview: (gameId, body) => request(`/games/${gameId}/reviews`, { method: 'POST', body }),
   updateReview: (id, body) => request(`/reviews/${id}`, { method: 'PATCH', body }),
   deleteReview: (id) => request(`/reviews/${id}`, { method: 'DELETE' }),
+  voteReview: (id, value) => request(`/reviews/${id}/vote`, { method: 'PUT', body: { value } }),
 };

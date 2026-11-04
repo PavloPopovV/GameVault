@@ -31,6 +31,28 @@ function LibraryBadge({ status }) {
   );
 }
 
+// Група фільтрів: «пігулки» з вибором одного значення (radiogroup), активна — акцентна
+function FilterGroup({ title, all, items, value, onChange }) {
+  const options = [{ id: '', name: all }, ...items];
+  return (
+    <div className="filters__group">
+      <span className="filters__label" id={`f-${title}`}>{title}</span>
+      <div className="filters__chips" role="radiogroup" aria-labelledby={`f-${title}`}>
+        {options.map((o) => {
+          const active = (o.id === '' ? '' : o.name) === value;
+          return (
+            <button key={o.id || 'all'} type="button" role="radio" aria-checked={active}
+              className={`filter-chip ${active ? 'filter-chip--active' : ''}`}
+              onClick={() => onChange(o.id === '' ? '' : o.name)}>
+              {o.name}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function CatalogPage() {
   const [params, setParams] = useSearchParams();
   const { user, isAuthenticated } = useAuth();
@@ -76,36 +98,23 @@ export default function CatalogPage() {
   };
 
   const [genres, platforms] = taxonomy.data ?? [[], []];
+  const activeCount = [genre, platform].filter(Boolean).length;
   const total = list.data?.pagination.total ?? 0;
   const hasItems = Boolean(list.data?.items.length);
   const gridKey = list.data?.items.map((g) => g.id).join('-') ?? '';
 
   return (
     <div className="catalog">
-      <aside className={`filters card ${filtersOpen ? 'filters--open' : ''}`}>
+      <aside className={`filters card liquid ${filtersOpen ? 'filters--open' : ''}`}>
         <div className="filters__head">
           <h2>Фільтри</h2>
+          {activeCount > 0 && <span className="filters__badge">{activeCount}</span>}
           <button type="button" className="btn btn--ghost btn--sm filters__close" onClick={() => setFiltersOpen(false)}>Готово</button>
         </div>
-        <fieldset className="filters__group">
-          <legend>Жанр</legend>
-          <label className="radio"><input type="radio" name="genre" checked={!genre} onChange={() => update({ genre: '' })} /> Усі жанри</label>
-          {genres.map((g) => (
-            <label key={g.id} className="radio">
-              <input type="radio" name="genre" checked={genre === g.name} onChange={() => update({ genre: g.name })} /> {g.name}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset className="filters__group">
-          <legend>Платформа</legend>
-          <label className="radio"><input type="radio" name="platform" checked={!platform} onChange={() => update({ platform: '' })} /> Усі платформи</label>
-          {platforms.map((p) => (
-            <label key={p.id} className="radio">
-              <input type="radio" name="platform" checked={platform === p.name} onChange={() => update({ platform: p.name })} /> {p.name}
-            </label>
-          ))}
-        </fieldset>
-        <button type="button" className="btn btn--secondary btn--block" onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>
+        <FilterGroup title="Жанр" all="Усі жанри" items={genres} value={genre} onChange={(v) => update({ genre: v })} />
+        <FilterGroup title="Платформа" all="Усі платформи" items={platforms} value={platform} onChange={(v) => update({ platform: v })} />
+        <button type="button" className="btn btn--secondary btn--block filters__reset" disabled={!activeCount}
+          onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>
       </aside>
 
       <section className="catalog__content">

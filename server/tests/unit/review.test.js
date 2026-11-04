@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateReview, canModifyReview, canReviewGame } from '../../src/domain/review.js';
+import { validateReview, canModifyReview, canReviewGame, validateVote, toggleVote } from '../../src/domain/review.js';
 
 const okText = 'Чудова гра, рекомендую всім!';
 
@@ -70,5 +70,24 @@ describe('canReviewGame (GV-21)', () => {
   it('гри немає в бібліотеці — не можна', () => {
     expect(canReviewGame(null)).toBe(false);
     expect(canReviewGame(undefined)).toBe(false);
+  });
+});
+
+describe('голоси за рецензії', () => {
+  const review = { id: 'r1', userId: 'author' };
+  it('validateVote: 1 / -1 / 0 від іншого користувача — ок', () => {
+    for (const v of [1, -1, 0]) expect(validateVote(review, { id: 'u2' }, v)).toBeNull();
+  });
+  it('validateVote: інше значення — помилка', () => {
+    expect(validateVote(review, { id: 'u2' }, 2)).toMatch(/1, -1 або 0/);
+  });
+  it('validateVote: за власну рецензію — помилка', () => {
+    expect(validateVote(review, { id: 'author' }, 1)).toMatch(/власну/);
+  });
+  it('toggleVote: повторний клік знімає голос, інший — перемикає', () => {
+    expect(toggleVote(0, 1)).toBe(1);
+    expect(toggleVote(1, 1)).toBe(0);
+    expect(toggleVote(1, -1)).toBe(-1);
+    expect(toggleVote(-1, -1)).toBe(0);
   });
 });

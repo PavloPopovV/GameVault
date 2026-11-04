@@ -36,6 +36,21 @@ export function canReviewGame(libraryEntry) {
   return Boolean(libraryEntry);
 }
 
+/**
+ * Голос за рецензію: value — 1 (👍), -1 (👎) або 0 (зняти голос).
+ * Повертає помилку або null. За власну рецензію голосувати не можна.
+ */
+export function validateVote(review, user, value) {
+  if (![1, -1, 0].includes(value)) return 'Голос має бути 1, -1 або 0';
+  if (review && user && review.userId === user.id) return 'Не можна оцінювати власну рецензію';
+  return null;
+}
+
+/** Повторний клік по тій самій кнопці знімає голос, по іншій — перемикає. */
+export function toggleVote(current, clicked) {
+  return current === clicked ? 0 : clicked;
+}
+
 /** Чи може користувач змінювати / видаляти рецензію. */
 export function canModifyReview(review, user) {
   if (!review || !user) return false;

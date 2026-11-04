@@ -202,8 +202,9 @@ r.post(
 r.get(
   '/games/:gameId/reviews',
   validate(S.uuidParam('gameId'), 'params'),
+  optionalAuth,
   validate(S.pageQuery, 'query'),
-  h(async (req, res) => res.json(await reviewsSvc.listGameReviews(req.params.gameId, req.query))),
+  h(async (req, res) => res.json(await reviewsSvc.listGameReviews(req.params.gameId, req.query, req.user))),
 );
 r.post(
   '/games/:gameId/reviews',
@@ -211,6 +212,13 @@ r.post(
   validate(S.uuidParam('gameId'), 'params'),
   validate(S.createReviewSchema),
   h(async (req, res) => res.status(201).json(await reviewsSvc.createReview(req.user, req.params.gameId, req.body))),
+);
+r.put(
+  '/reviews/:id/vote',
+  requireAuth,
+  validate(S.uuidParam('id'), 'params'),
+  validate(S.voteSchema),
+  h(async (req, res) => res.json(await reviewsSvc.voteReview(req.user, req.params.id, req.body.value))),
 );
 r.patch(
   '/reviews/:id',
