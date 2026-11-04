@@ -33,6 +33,11 @@ r.get(
   requireAuth,
   h(async (req, res) => res.json(await usersSvc.getMe(req.user.id))),
 );
+r.get(
+  '/users/me/reviews',
+  requireAuth,
+  h(async (req, res) => res.json(await usersSvc.listMyReviews(req.user.id))),
+);
 r.patch(
   '/users/me',
   requireAuth,

@@ -128,3 +128,37 @@ describe('Catalog + Library + Reviews API', () => {
     expect((await api('get', '/games/not-a-uuid/reviews')).status).toBe(400);
   });
 });
+
+describe('Profile API', () => {
+  it('GET /users/me/reviews повертає рецензії користувача з даними гри', async () => {
+    const token = await registerUser('frank');
+    const auth = { Authorization: `Bearer ${token}` };
+    expect((await api('get', '/users/me/reviews').set(auth)).body).toEqual([]);
+    await api('post', `/games/${gameId}/reviews`).set(auth).send({ rating: 7, text: 'Непогана тестова гра' });
+    const res = await api('get', '/users/me/reviews').set(auth);
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ rating: 7, game: { id: gameId, title: 'Test Quest', slug: 'test-quest' } });
+    expect((await api('get', '/users/me/reviews')).status).toBe(401);
+  });
+
+  it('зміна Email: без пароля 400, невірний пароль 400, зайнятий 409, успіх → вхід з новим Email', async () => {
+    const token = await registerUser('grace');
+    await registerUser('heidi');
+    const auth = { Authorization: `Bearer ${token}` };
+    const patch = (body) => api('patch', '/users/me').set(auth).send(body);
+
+    expect((await patch({ email: 'new@test.dev' })).status).toBe(400);
+    const wrong = await patch({ email: 'new@test.dev', currentPassword: 'WrongPass1' });
+    expect(wrong.status).toBe(400);
+    expect(wrong.body.details[0].field).toBe('currentPassword');
+    const taken = await patch({ email: 'heidi@test.dev', currentPassword: 'Secret123' });
+    expect(taken.status).toBe(409);
+    expect(taken.body.details[0].field).toBe('email');
+
+    const ok = await patch({ email: 'Grace.New@Test.dev', currentPassword: 'Secret123' });
+    expect(ok.status).toBe(200);
+    expect(ok.body.email).toBe('grace.new@test.dev');
+    expect((await api('post', '/auth/login').send({ email: 'grace.new@test.dev', password: 'Secret123' })).status).toBe(200);
+  });
+});

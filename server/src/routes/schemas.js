@@ -71,7 +71,15 @@ export const updateReviewSchema = z
   .object({ rating: rating.optional(), text: reviewText.optional() })
   .refine((o) => o.rating !== undefined || o.text !== undefined, 'Немає полів для оновлення');
 
-export const updateProfileSchema = z.object({
-  username: registerSchema.shape.username.optional(),
-  bio: z.string().trim().max(200, 'Bio — до 200 символів').optional(),
-});
+export const updateProfileSchema = z
+  .object({
+    username: registerSchema.shape.username.optional(),
+    bio: z.string().trim().max(200, 'Bio — до 200 символів').optional(),
+    email: registerSchema.shape.email.optional(),
+    currentPassword: z.string().max(72).optional(),
+  })
+  // Зміна Email (= логіну) — лише з підтвердженням поточним паролем
+  .refine((d) => !d.email || d.currentPassword, {
+    path: ['currentPassword'],
+    message: 'Для зміни Email введіть поточний пароль',
+  });
