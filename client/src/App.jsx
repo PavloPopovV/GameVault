@@ -3,21 +3,26 @@ import Layout from './components/Layout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { EmptyState } from './components/States.jsx';
 import AuthPage from './pages/AuthPage.jsx';
-import { useAuth } from './context/AuthContext.jsx';
+import CatalogPage from './pages/CatalogPage.jsx';
+import GamePage from './pages/GamePage.jsx';
+import LibraryPage from './pages/LibraryPage.jsx';
+import WishlistPage from './pages/WishlistPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 
-function Dashboard() {
-  const { user } = useAuth();
-  return <EmptyState title={`Вітаємо, ${user.username}!`} text={`Ви увійшли як ${user.email}`} />;
-}
+const guard = (el) => <ProtectedRoute>{el}</ProtectedRoute>;
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<EmptyState title="Каталог у розробці" action={<Link to="/dashboard" className="btn btn--primary">Мій кабінет</Link>} />} />
+        <Route index element={<CatalogPage />} />
+        <Route path="games/:slug" element={<GamePage />} />
         <Route path="login" element={<AuthPage mode="login" />} />
         <Route path="register" element={<AuthPage mode="register" />} />
-        <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="library" element={guard(<LibraryPage />)} />
+        <Route path="wishlist" element={guard(<WishlistPage />)} />
+        <Route path="profile" element={guard(<ProfilePage />)} />
+        <Route path="dashboard" element={guard(<LibraryPage />)} />
         <Route path="*" element={<EmptyState title="Сторінку не знайдено" action={<Link to="/" className="btn btn--primary">На головну</Link>} />} />
       </Route>
     </Routes>
