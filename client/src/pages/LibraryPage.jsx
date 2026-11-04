@@ -3,6 +3,7 @@ import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
+import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
@@ -59,10 +60,8 @@ export default function LibraryPage() {
               </span>
             </div>
             <div className="list-item__actions">
-              <select className={`select select--status status--${e.status.toLowerCase()}`} value={e.status}
-                onChange={(ev) => changeStatus(e, ev.target.value)} aria-label={`Статус ${e.game.title}`}>
-                {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-              </select>
+              <Select className="select--status" size="sm" value={e.status} options={STATUSES}
+                onChange={(v) => changeStatus(e, v)} label={`Статус ${e.game.title}`} />
               <button type="button" className="btn btn--ghost btn--sm btn--danger" onClick={() => remove(e)}>Прибрати</button>
             </div>
           </li>

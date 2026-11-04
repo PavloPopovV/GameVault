@@ -34,7 +34,7 @@ export default function Layout() {
         <div className="container header__inner">
           <Link to="/" className="logo" aria-label="GameVault — на головну">
             <img src="/favicon.svg" alt="" width="32" height="32" />
-            <span>GameVault</span>
+            <span className="brand-name">GameVault</span>
           </Link>
 
           <form className="search" onSubmit={onSearch} role="search">

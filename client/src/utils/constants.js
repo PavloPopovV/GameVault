@@ -1,8 +1,8 @@
 export const STATUSES = [
-  { value: 'WANT_TO_PLAY', label: 'Хочу пройти' },
-  { value: 'PLAYING', label: 'Граю' },
-  { value: 'COMPLETED', label: 'Пройдено' },
-  { value: 'DROPPED', label: 'Закинув' },
+  { value: 'WANT_TO_PLAY', label: 'Хочу пройти', tone: 'want_to_play' },
+  { value: 'PLAYING', label: 'Граю', tone: 'playing' },
+  { value: 'COMPLETED', label: 'Пройдено', tone: 'completed' },
+  { value: 'DROPPED', label: 'Закинув', tone: 'dropped' },
 ];
 export const statusLabel = (v) => STATUSES.find((s) => s.value === v)?.label ?? v;
 

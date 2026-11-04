@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import GameCover from './GameCover.jsx';
 
-export default function GameCard({ game, footer }) {
+export default function GameCard({ game, footer, index = 0 }) {
   return (
-    <article className="game-card">
+    <article className="game-card" style={{ '--i': index }}>
       <Link to={`/games/${game.slug}`} className="game-card__link">
         <GameCover title={game.title} coverUrl={game.coverUrl} />
         <div className="game-card__body">
