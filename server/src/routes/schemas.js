@@ -31,12 +31,17 @@ export const pageQuery = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
+// null у необов'язкових полях = «очистити» (адмін прибирає опис/обкладинку при редагуванні)
 const gameBase = {
-  title: z.string().trim().min(1).max(150),
-  description: z.string().trim().max(5000).optional(),
-  releaseYear: z.number().int().min(1970).max(2100).optional(),
-  coverUrl: z.string().url().max(500).optional(),
-  developer: z.string().trim().max(100).optional(),
+  title: z
+    .string({ message: "Назва обов'язкова" })
+    .trim()
+    .min(1, "Назва обов'язкова")
+    .max(150, 'Назва до 150 символів'),
+  description: z.string().trim().max(5000, 'Опис до 5000 символів').nullable().optional(),
+  releaseYear: z.number().int().min(1970, 'Рік від 1970').max(2100, 'Рік до 2100').nullable().optional(),
+  coverUrl: z.string().url('Некоректне посилання').max(500).nullable().optional(),
+  developer: z.string().trim().max(100, 'Розробник до 100 символів').nullable().optional(),
   genres: z.array(z.string()).optional(),
   platforms: z.array(z.string()).optional(),
 };

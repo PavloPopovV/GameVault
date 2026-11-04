@@ -1,4 +1,4 @@
-import { and, asc, eq, ilike, inArray, sql } from 'drizzle-orm';
+import { and, asc, eq, ilike, inArray, ne, or, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import {
   games,
@@ -10,7 +10,7 @@ import {
   libraryEntries,
   wishlistItems,
 } from '../db/schema.js';
-import { notFound } from '../utils/errors.js';
+import { conflict, notFound } from '../utils/errors.js';
 import { slugify } from '../utils/slug.js';
 
 const avgRating = sql`round(avg(${reviews.rating})::numeric, 1)`.mapWith(Number).as('average_rating');
@@ -173,7 +173,23 @@ async function setTaxonomy(tx, gameId, genreNames, platformNames) {
   }
 }
 
+// Назва й slug унікальні в БД; перевіряємо заздалегідь, щоб форма адміна підсвітила саме поле назви.
+// lower(): «Test Quest» і «test quest» дають однаковий slug, тож вважаємо їх дублем.
+async function ensureTitleFree(title, exceptId) {
+  const slug = slugify(title);
+  const same = or(eq(sql`lower(${games.title})`, title.toLowerCase()), eq(games.slug, slug));
+  const existing = await db.query.games.findFirst({
+    where: exceptId ? and(same, ne(games.id, exceptId)) : same,
+    columns: { id: true },
+  });
+  if (existing) {
+    const message = 'Гра з такою назвою вже є в каталозі';
+    throw conflict(message, [{ field: 'title', message }]);
+  }
+}
+
 export async function createGame({ genres: g = [], platforms: p = [], ...data }) {
+  await ensureTitleFree(data.title);
   const id = await db.transaction(async (tx) => {
     const [game] = await tx
       .insert(games)
@@ -187,6 +203,7 @@ export async function createGame({ genres: g = [], platforms: p = [], ...data })
 
 export async function updateGame(id, { genres: g, platforms: p, ...data }) {
   await ensureGameExists(id);
+  if (data.title) await ensureTitleFree(data.title, id);
   await db.transaction(async (tx) => {
     if (Object.keys(data).length) {
       if (data.title) data.slug = slugify(data.title);

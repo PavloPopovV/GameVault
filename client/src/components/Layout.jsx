@@ -68,6 +68,7 @@ export default function Layout() {
               <>
                 <NavLink to="/library" className="nav__link">Моя бібліотека<Counter value={user.stats?.totalGames} /></NavLink>
                 <NavLink to="/wishlist" className="nav__link">Wishlist<Counter value={user.stats?.wishlistCount} /></NavLink>
+                {user.role === 'ADMIN' && <NavLink to="/admin/games" className="nav__link">Адмінка</NavLink>}
               </>
             )}
             {isAuthenticated ? (

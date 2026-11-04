@@ -7,7 +7,7 @@ const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), textar
  * Модальне вікно: Esc і клік по фону закривають, фокус тримається всередині,
  * після закриття повертається на кнопку, що його відкрила; прокрутка сторінки блокується.
  */
-export default function Modal({ open, title, onClose, children }) {
+export default function Modal({ open, title, onClose, children, wide = false }) {
   const dialogRef = useRef(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -44,7 +44,7 @@ export default function Modal({ open, title, onClose, children }) {
 
   return createPortal(
     <div className="modal" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={dialogRef}>
+      <div className={`modal__dialog card ${wide ? 'modal__dialog--wide' : ''}`} role="dialog" aria-modal="true" aria-labelledby={titleId} ref={dialogRef}>
         <div className="modal__head">
           <h2 id={titleId} className="modal__title">{title}</h2>
           <button type="button" className="modal__close" onClick={onClose} aria-label="Закрити">×</button>

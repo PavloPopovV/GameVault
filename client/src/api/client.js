@@ -77,6 +77,9 @@ export const api = {
   platforms: () => request('/platforms'),
   games: (query) => request('/games', { query }),
   game: (idOrSlug) => request(`/games/${encodeURIComponent(idOrSlug)}`),
+  createGame: (body) => request('/games', { method: 'POST', body }),
+  updateGame: (id, body) => request(`/games/${id}`, { method: 'PATCH', body }),
+  deleteGame: (id) => request(`/games/${id}`, { method: 'DELETE' }),
 
   library: (status) => request('/library', { query: { status } }),
   addToLibrary: (gameId, status) => request('/library', { method: 'POST', body: { gameId, status } }),
