@@ -51,7 +51,7 @@ export default function ActionsMenu({ items, label = 'Дії' }) {
         <span /><span /><span />
       </button>
       {open && (
-        <div className="menu__list" role="menu" id={menuId} ref={menuRef} onKeyDown={onMenuKey}>
+        <div className="menu__list liquid" role="menu" id={menuId} ref={menuRef} onKeyDown={onMenuKey}>
           {items.map((item) => (
             <button
               key={item.label}

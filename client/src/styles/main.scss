@@ -244,14 +244,24 @@ p { margin: 0; }
 @media (max-width: $bp-sm) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
 
 .game-card {
-  min-width: 0;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px;
-  display: flex; flex-direction: column; gap: 10px; transition: transform 0.15s, border-color 0.15s;
-  &:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+  position: relative; min-width: 0; border-radius: var(--radius); background: var(--surface-2);
+  transition: transform 0.2s var(--ease-out);
+  &:hover { transform: translateY(-3px); .game-card__media .cover { transform: scale(1.04); } }
 }
-.game-card__link { display: flex; flex-direction: column; gap: 10px; }
-.game-card__title { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.game-card__meta { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.game-card__media {
+  display: block; border-radius: var(--radius); overflow: hidden;
+  .cover { border-radius: 0; transition: transform 0.4s var(--ease-out); }
+}
+/* панель «рідкого скла» поверх нижньої частини обкладинки */
+.game-card__panel {
+  position: absolute; left: 8px; right: 8px; bottom: 8px; padding: 10px 10px 10px 12px; border-radius: 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.game-card__title {
+  font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+.game-card__meta { font-size: 12px; color: rgba(255, 255, 255, 0.72); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 6px; }
 .game-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; flex-wrap: wrap; }
 .game-card__footer--actions {
   flex-wrap: nowrap;
@@ -425,7 +435,7 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   width: 40px; height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
   color: var(--tone);
   background: linear-gradient(135deg, color-mix(in srgb, var(--tone) 22%, transparent), color-mix(in srgb, var(--tone) 6%, transparent));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 35%, transparent), 0 0 12px color-mix(in srgb, var(--tone) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 35%, transparent);
   transition: transform 0.2s var(--ease-out);
 }
 .quest__text { display: flex; flex-direction: column; min-width: 0; }
@@ -436,7 +446,7 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   border-radius: 4px; background: #070708; box-shadow: inset 0 0 0 1px var(--border);
   i { border-radius: 1px; background: rgba(255, 255, 255, 0.05); }
   i.is-on {
-    background: var(--tone); box-shadow: 0 0 6px color-mix(in srgb, var(--tone) 70%, transparent);
+    background: var(--tone);
     animation: segment-on 0.25s var(--ease-out) both; animation-delay: var(--d);
   }
 }
@@ -444,3 +454,46 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 .quest__count { font-size: 16px; font-weight: 800; letter-spacing: 0.02em; text-align: right; color: var(--tone); font-variant-numeric: tabular-nums; }
 .quest--empty { .quest__count, .quest__label { opacity: 0.55; } .quest__icon { filter: grayscale(1); opacity: 0.6; } }
 @media (prefers-reduced-motion: reduce) { .quest__bar i.is-on { animation: none; } .quest__icon { transition: none; } }
+
+/* ======================================================================
+   Liquid Glass (експеримент, як в iOS): прозорість без «фарбування»,
+   світлі кромки-відблиски, легке розмиття і заломлення фону біля країв.
+   Щоб відкотити — прибрати цей блок і класи liquid / компоненти LiquidGlassFilter, PageBackdrop.
+   ====================================================================== */
+.liquid {
+  /* position задає сам компонент (sticky / absolute / relative) — тут не перебиваємо */
+  isolation: isolate;
+  background: rgba(18, 18, 20, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(3px) saturate(180%);
+  backdrop-filter: blur(3px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
+    inset -1px 0 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 24px rgba(255, 255, 255, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.4);
+  &::after { /* дзеркальний відблиск по діагоналі */
+    content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 22%, transparent 42%,
+      transparent 72%, rgba(255, 255, 255, 0.07) 100%);
+  }
+}
+.liquid-refraction .liquid { backdrop-filter: url(#liquid-glass) blur(1.5px) saturate(180%); }
+.header.liquid { border-width: 0 0 1px; background: rgba(0, 0, 0, 0.35); box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06); &::after { display: none; } }
+.dropdown__menu.liquid, .menu__list.liquid { background: rgba(22, 22, 24, 0.62); }
+.quest-log.liquid { background: radial-gradient(120% 140% at 100% 0%, rgba(242, 96, 12, 0.12), transparent 55%), rgba(18, 18, 20, 0.32); }
+.review-card.liquid { position: relative; background: rgba(18, 18, 20, 0.34); }
+.review-card--mine.liquid { border-color: var(--accent-line); }
+.review-card.liquid:hover { border-color: rgba(255, 255, 255, 0.22); }
+
+/* Фоновий арт сторінки (профіль, сторінка гри) — під скляними панелями */
+.backdrop {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  img {
+    width: 100%; height: 75vh; object-fit: cover; object-position: center 25%; opacity: 0.5;
+    -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 100%); mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+  }
+  &::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 35%); }
+}

@@ -9,6 +9,11 @@ import { ToastProvider } from './context/ToastContext.jsx';
 import '@fontsource/press-start-2p/latin-400.css';
 import './styles/main.scss';
 
+// Заломлення «рідкого скла» (SVG у backdrop-filter) підтримує лише Chromium — вмикаємо там класом
+if (navigator.userAgentData?.brands?.some((b) => b.brand === 'Chromium')) {
+  document.documentElement.classList.add('liquid-refraction');
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>

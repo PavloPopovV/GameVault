@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
+import LiquidGlassFilter from './LiquidGlassFilter.jsx';
 
 // Бейдж-лічильник як у кошика магазину: лише коли є хоча б одна гра.
 // key={value} перезапускає анімацію «підстрибування» при кожній зміні числа.
@@ -42,7 +43,8 @@ export default function Layout() {
 
   return (
     <div className="app">
-      <header className="header">
+      <LiquidGlassFilter />
+      <header className="header liquid">
         <div className="container header__inner">
           <Link to="/" className="logo" aria-label="GameVault — на головну">
             <img src="/favicon.svg" alt="" width="32" height="32" />

@@ -22,7 +22,7 @@ export default function ReviewCard({ review, media, title, mine = false, clamp =
   };
 
   return (
-    <article className={`review-card card ${mine ? 'review-card--mine' : ''}`}>
+    <article className={`review-card card liquid ${mine ? 'review-card--mine' : ''}`}>
       <div className="review-card__media">{media}</div>
       <div className="review-card__body">
         <div className="review-card__head">
