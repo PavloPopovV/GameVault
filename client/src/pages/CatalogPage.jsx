@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
@@ -35,8 +35,11 @@ export default function CatalogPage() {
   const [params, setParams] = useSearchParams();
   const { user, isAuthenticated } = useAuth();
   const toast = useToast();
-  // Статуси, змінені на цій сторінці (поверх libraryStatus, який приходить з API)
-  const [added, setAdded] = useState(() => new Map());
+  // Статуси, змінені на цій сторінці (поверх libraryStatus, який приходить з API): gameId → статус
+  const [localStatuses, setLocalStatuses] = useState(() => new Map());
+  // Інший користувач (вихід / вхід під іншим акаунтом) — локальні статуси попереднього більше не актуальні
+  useEffect(() => { setLocalStatuses(new Map()); }, [user?.id]);
+  const statusOf = (game) => localStatuses.get(game.id) ?? game.libraryStatus;
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const q = params.get('q') || '';
@@ -58,14 +61,14 @@ export default function CatalogPage() {
   const addToLibrary = async (game) => {
     try {
       await api.addToLibrary(game.id, 'WANT_TO_PLAY');
-      setAdded((s) => new Map(s).set(game.id, 'WANT_TO_PLAY'));
+      setLocalStatuses((s) => new Map(s).set(game.id, 'WANT_TO_PLAY'));
       toast.success(`«${game.title}» додано в бібліотеку`);
     } catch (err) {
       if (err.status === 409) {
         // Гра вже в бібліотеці (напр., додана в іншій вкладці) — оновлюємо лише цю картку, без перезавантаження сітки
         toast.info(`«${game.title}» вже є у вашій бібліотеці`);
         const fresh = await api.game(game.slug).catch(() => null);
-        setAdded((s) => new Map(s).set(game.id, fresh?.me?.libraryStatus ?? 'UNKNOWN'));
+        setLocalStatuses((s) => new Map(s).set(game.id, fresh?.me?.libraryStatus ?? 'UNKNOWN'));
       } else {
         toast.error(err.message);
       }
@@ -131,8 +134,8 @@ export default function CatalogPage() {
               {list.data.items.map((game, i) => (
                 <GameCard key={game.id} game={game} index={i} footer={
                   isAuthenticated ? (
-                    (added.get(game.id) ?? game.libraryStatus)
-                      ? <LibraryBadge status={added.get(game.id) ?? game.libraryStatus} />
+                    statusOf(game)
+                      ? <LibraryBadge status={statusOf(game)} />
                       : <button type="button" className="btn btn--outline btn--xs" onClick={() => addToLibrary(game)}>+ У бібліотеку</button>
                   ) : <Link to="/login" className="btn btn--outline btn--xs">+ У бібліотеку</Link>
                 } />
