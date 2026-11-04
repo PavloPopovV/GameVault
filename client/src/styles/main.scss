@@ -281,11 +281,26 @@ p { margin: 0; }
 .reviews { display: flex; flex-direction: column; gap: 14px; }
 .review-form { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .rating-picker { display: flex; flex-wrap: wrap; gap: 6px; }
-.review { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
-.review--mine { border-color: var(--accent-line); }
-.review__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.review__rating { margin-left: auto; }
-.review__text { color: var(--text-soft); white-space: pre-line; }
+.review-form--plain { padding: 0; .chip { min-width: 34px; padding: 0 8px; } .rating-picker { gap: 5px; } }
+/* Плашка рецензії — однакова на сторінці гри і в профілі */
+.review-card {
+  display: flex; align-items: flex-start; gap: 16px; padding: 14px 16px;
+  transition: transform 0.15s, border-color 0.15s; /* такий самий ховер, як у карток каталогу */
+  &:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+  &:has(.menu__list) { position: relative; z-index: 5; } /* відкрите меню «⋯» — над сусідніми плашками */
+}
+.review-card--mine, .review-card--mine:hover { border-color: var(--accent-line); }
+@media (prefers-reduced-motion: reduce) { .review-card, .game-card { transition: none; &:hover { transform: none; } } }
+.review-card__media { flex-shrink: 0; display: flex; }
+.review-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.review-card__head { display: flex; align-items: center; gap: 12px; min-height: 32px; }
+.review-card__title { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.review-card__link:hover { color: var(--accent); }
+.review-card__rating { flex-shrink: 0; }
+.review-card__menu { margin-left: auto; margin-right: -6px; }
+.review-card__text { color: var(--text-soft); white-space: pre-line; }
+.review-card__text--clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.review-card__date { font-size: 13px; color: var(--muted); }
 
 /* ---------- Lists (library / wishlist) ---------- */
 .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -302,14 +317,7 @@ p { margin: 0; }
 .profile__bio { color: var(--text-soft); max-width: 60ch; white-space: pre-line; }
 .profile__bio--empty { color: var(--muted); font-style: italic; }
 .profile__meta { color: var(--muted); font-size: 14px; }
-.profile__reviews { display: flex; flex-direction: column; }
-.list-item--top { align-items: flex-start; }
-.review-item__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.review-item__text {
-  margin-top: 6px; color: var(--text-soft); white-space: pre-line;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
-.review-item__date { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.profile__reviews { display: flex; flex-direction: column; scroll-margin-top: 92px; }
 
 /* ---------- Modal ---------- */
 .modal {
@@ -391,21 +399,18 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
     background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px);
   }
 }
-.quest-log__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
-.quest-log__kicker { display: block; font-family: var(--font-logo); font-size: 9px; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px; }
+.quest-log__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
 .quest-log__title { margin: 0; }
-.quest-log__level { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .quest-log__lvl {
   font-family: var(--font-logo); font-size: 12px; padding: 8px 10px; border-radius: 6px; color: #fff;
   background: var(--accent); box-shadow: 0 0 0 2px rgba(242, 96, 12, 0.25), 0 0 18px rgba(242, 96, 12, 0.45);
 }
-.quest-log__xp { font-size: 12px; color: var(--muted); }
 .quest-log__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .quest {
   --tone: #94a3b8;
   display: grid; grid-template-columns: 40px 150px 1fr 48px; align-items: center; gap: 14px; padding: 10px 12px;
   border-radius: 10px; border: 1px solid transparent; transition: background 0.15s, border-color 0.15s;
-  &:hover { background: var(--surface-2); border-color: var(--border); .quest__icon { transform: translateY(-1px) rotate(-6deg); } }
+  &:hover { background: var(--surface-2); border-color: var(--border); .quest__icon { transform: translateY(-2px) scale(1.06); } }
   @media (max-width: $bp-sm) {
     grid-template-columns: 40px 1fr 48px; row-gap: 10px; padding: 10px 4px;
     .quest__count { grid-column: 3; grid-row: 1; }
@@ -418,8 +423,10 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 .quest--dropped { --tone: var(--danger); }
 .quest__icon {
   width: 40px; height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
-  color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 35%, transparent); transition: transform 0.2s var(--ease-out);
+  color: var(--tone);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tone) 22%, transparent), color-mix(in srgb, var(--tone) 6%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 35%, transparent), 0 0 12px color-mix(in srgb, var(--tone) 18%, transparent);
+  transition: transform 0.2s var(--ease-out);
 }
 .quest__text { display: flex; flex-direction: column; min-width: 0; }
 .quest__label { font-weight: 700; }
@@ -434,6 +441,6 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   }
 }
 @keyframes segment-on { from { opacity: 0; transform: scaleY(0.3); } }
-.quest__count { font-family: var(--font-logo); font-size: 12px; text-align: right; color: var(--tone); }
+.quest__count { font-size: 16px; font-weight: 800; letter-spacing: 0.02em; text-align: right; color: var(--tone); font-variant-numeric: tabular-nums; }
 .quest--empty { .quest__count, .quest__label { opacity: 0.55; } .quest__icon { filter: grayscale(1); opacity: 0.6; } }
 @media (prefers-reduced-motion: reduce) { .quest__bar i.is-on { animation: none; } .quest__icon { transition: none; } }
