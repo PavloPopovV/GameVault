@@ -1,16 +1,20 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAsync } from '../hooks/useAsync.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import GameCover from '../components/GameCover.jsx';
 import Select from '../components/Select.jsx';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 import { STATUSES, formatDate } from '../utils/constants.js';
 
+const ChipCount = ({ value }) => (value ? <span className="chip__count">{value}</span> : null);
+
 export default function LibraryPage() {
   const [params, setParams] = useSearchParams();
   const status = params.get('status') || '';
   const toast = useToast();
+  const stats = useAuth().user?.stats;
   const lib = useAsync(() => api.library(status || undefined), [status]);
 
   const changeStatus = async (entry, next) => {
@@ -35,10 +39,10 @@ export default function LibraryPage() {
     <div>
       <h1 className="page-title">Моя бібліотека</h1>
       <div className="chips chips--tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={!status} className={`chip ${!status ? 'chip--active' : ''}`} onClick={() => setParams({})}>Усі</button>
+        <button type="button" role="tab" aria-selected={!status} className={`chip ${!status ? 'chip--active' : ''}`} onClick={() => setParams({})}>Усі<ChipCount value={stats?.totalGames} /></button>
         {STATUSES.map((s) => (
           <button key={s.value} type="button" role="tab" aria-selected={status === s.value}
-            className={`chip ${status === s.value ? 'chip--active' : ''}`} onClick={() => setParams({ status: s.value })}>{s.label}</button>
+            className={`chip ${status === s.value ? 'chip--active' : ''}`} onClick={() => setParams({ status: s.value })}>{s.label}<ChipCount value={stats?.byStatus?.[s.value]} /></button>
         ))}
       </div>
 

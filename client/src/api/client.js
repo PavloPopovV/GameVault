@@ -24,6 +24,11 @@ export class ApiError extends Error {
 let onUnauthorized = () => {};
 export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 
+// Викликається після успішної зміни бібліотеки або Wishlist — щоб оновити лічильники в шапці
+let onCollectionChange = () => {};
+export const setCollectionChangeHandler = (fn) => { onCollectionChange = fn; };
+const COLLECTION_PATH = /^\/(library|wishlist)(\/|$)/;
+
 export async function request(path, { method = 'GET', body, query, auth = true } = {}) {
   const url = new URL(BASE + path, window.location.origin);
   if (query) {
@@ -43,6 +48,8 @@ export async function request(path, { method = 'GET', body, query, auth = true }
     throw new ApiError(0, 'Немає з\'єднання з сервером. Перевірте інтернет і спробуйте ще раз.');
   }
 
+  const changed = res.ok && method !== 'GET' && COLLECTION_PATH.test(path);
+  if (changed) onCollectionChange();
   if (res.status === 204) return null;
   const data = await res.json().catch(() => null);
   if (!res.ok) {
