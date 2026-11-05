@@ -6,7 +6,7 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    branch: develop
+    branch: main # прод деплоїться з main (реліз v1.0.0); develop — інтеграція
     rootDir: server
     buildCommand: npm ci --include=dev && npm run db:migrate && npm run db:seed:if-empty && npm run covers:rawg:optional
     startCommand: npm start
