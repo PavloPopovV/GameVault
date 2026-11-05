@@ -623,3 +623,4 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 }
 // Скло (.liquid) створює власний stacking context — рядок з відкритим меню піднімаємо над сусідами
 .admin-row { position: relative; &:has(.menu__trigger--open) { z-index: 5; } }
+.profile__email { overflow-wrap: anywhere; }

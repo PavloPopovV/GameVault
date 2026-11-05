@@ -276,7 +276,8 @@ export default function ProfilePage() {
         <div className="profile__info">
           <h1 className="page-title">{user.username}</h1>
           {bio ? <p className="profile__bio">{bio}</p> : <p className="profile__bio profile__bio--empty">Розкажіть, у які ігри любите грати</p>}
-          <p className="profile__meta">З нами з {formatDate(user.createdAt)}</p>
+          {/* Email з /users/me бачить лише власник: профіль — захищена сторінка (вимога ПР7) */}
+          <p className="profile__meta"><span className="profile__email">{user.email}</span> · З нами з {formatDate(user.createdAt)}</p>
         </div>
         <div className="profile__actions">
           <ActionsMenu label="Дії з акаунтом" items={[
