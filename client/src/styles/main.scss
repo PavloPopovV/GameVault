@@ -377,7 +377,14 @@ p { margin: 0; }
 .vote--up.vote--active { border-color: rgba(34, 197, 94, 0.55); background: rgba(34, 197, 94, 0.14); color: #fff; }
 .vote--down.vote--active { border-color: rgba(239, 68, 68, 0.55); background: rgba(239, 68, 68, 0.14); color: #fff; }
 .vote--static { cursor: default; &:hover { border-color: var(--border); color: var(--text-soft); } &:active { transform: none; } }
-@media (max-width: $bp-sm) { .review-card__head { flex-wrap: wrap; } .review-card__side { margin-left: 0; width: 100%; justify-content: space-between; } }
+@media (max-width: $bp-sm) {
+  .review-card__head { flex-wrap: wrap; }
+  .review-card__side { margin-left: 0; width: 100%; justify-content: space-between; }
+  /* «⋯» — завжди у верхньому правому куті картки (звичний патерн), а не в рядку з лайками */
+  .review-card { position: relative; }
+  .review-card__menu { position: absolute; top: 8px; right: 8px; margin: 0; }
+  .review-card:has(.review-card__menu) .review-card__head { padding-right: 36px; }
+}
 .review-card__text { color: var(--text-soft); white-space: pre-line; }
 .review-card__text--clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .review-card__date { font-size: 13px; color: var(--muted); }
