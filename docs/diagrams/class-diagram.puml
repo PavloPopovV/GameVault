@@ -36,9 +36,12 @@ class Profile {
   + id: UUID
   + userId: UUID
   + bio: String
+  + avatar: Binary
+  + avatarUpdatedAt: Date
   + updatedAt: Date
   --
   + getStats(): ProfileStats
+  + setAvatar(image: DataURL): void
 }
 class Game {
   + id: UUID
@@ -47,6 +50,7 @@ class Game {
   + description: String
   + releaseYear: Integer
   + coverUrl: String
+  + backdropUrl: String
   + developer: String
   + createdAt: Date
   --
@@ -84,6 +88,15 @@ class Review {
   + text: String
   + createdAt: Date
   + updatedAt: Date
+  --
+  + canReview(entry: LibraryEntry): Boolean
+  + vote(user: User, value: -1..1): void
+}
+class ReviewVote {
+  + reviewId: UUID
+  + userId: UUID
+  + value: Integer  {-1, 1}
+  + createdAt: Date
 }
 
 User "1" *-- "1" Profile : має >
@@ -95,6 +108,13 @@ Game "1" -- "0..*" WishlistItem
 Game "1" -- "0..*" Review
 Game "*" -- "*" Genre : належить до >
 Game "*" -- "*" Platform : доступна на >
+Review "1" *-- "0..*" ReviewVote : отримує >
+User "1" -- "0..*" ReviewVote : ставить >
+note bottom of Review
+  Рецензію можна написати лише на гру
+  з власної бібліотеки; прибирання гри
+  з бібліотеки видаляє й рецензію
+end note
 User ..> Role
 LibraryEntry ..> LibraryStatus
 @enduml

@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793788560666,
+      "tag": "0000_init_database_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793795358392,
+      "tag": "0001_replace_non_steam_games",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793801977439,
+      "tag": "0002_reviews_require_library",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793802387729,
+      "tag": "0003_add_profile_avatar",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793812084483,
+      "tag": "0004_add_review_votes",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793820473062,
+      "tag": "0005_wishlist_excludes_library",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793878860569,
+      "tag": "0006_add_game_backdrop",
+      "breakpoints": true
+    }
+  ]
+}

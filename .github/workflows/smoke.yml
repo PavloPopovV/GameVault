@@ -1,0 +1,35 @@
+name: Smoke test (prod)
+
+# ПР11: головний сценарій користувача на живому деплої. Ручний запуск: Actions → «Smoke test (prod)» → Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      web_url:
+        description: 'Адреса фронтенду'
+        default: 'https://gamevault-sandy-eta.vercel.app'
+      api_url:
+        description: 'Адреса API'
+        default: 'https://gamevault-api-kopk.onrender.com'
+
+jobs:
+  smoke:
+    name: Smoke Test Suite
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: scripts/nfr } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node smoke.mjs
+        env:
+          WEB_URL: ${{ inputs.web_url }}
+          API_URL: ${{ inputs.api_url }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke
+          path: |
+            scripts/nfr/smoke.*
+            scripts/nfr/shots/

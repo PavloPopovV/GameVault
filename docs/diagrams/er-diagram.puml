@@ -27,6 +27,9 @@ entity "profiles" as profiles {
   --
   * user_id : uuid <<FK, UNIQUE>>
   bio : varchar(200)
+  avatar : bytea (≤ 200 КБ)
+  avatar_mime : varchar(20)
+  avatar_updated_at : timestamp
   * updated_at : timestamp
 }
 entity "games" as games {
@@ -37,6 +40,7 @@ entity "games" as games {
   description : text
   release_year : int
   cover_url : varchar(500)
+  backdrop_url : varchar(500)
   developer : varchar(100)
   * created_at : timestamp
 }
@@ -91,6 +95,13 @@ entity "reviews" as rv {
   ..
   UNIQUE (user_id, game_id)
 }
+entity "review_votes" as vt {
+  * review_id : uuid <<PK, FK>>
+  * user_id : uuid <<PK, FK>>
+  --
+  * value : smallint (CHECK -1 / 1)
+  * created_at : timestamp
+}
 
 users ||--|| profiles
 users ||--o{ le
@@ -103,10 +114,12 @@ games ||--o{ gg
 genres ||--o{ gg
 games ||--o{ gp
 platforms ||--o{ gp
+rv ||--o{ vt
+users ||--o{ vt
 
 legend right
   * — NOT NULL
   ON DELETE CASCADE для всіх FK
-  на users і games
+  на users, games і reviews
 endlegend
 @enduml

@@ -28,6 +28,9 @@ Table profiles {
   id uuid [pk, default: `gen_random_uuid()`]
   user_id uuid [not null, unique, ref: - users.id]
   bio varchar(200)
+  avatar bytea [note: 'фото профілю, ≤ 200 КБ']
+  avatar_mime varchar(20)
+  avatar_updated_at timestamp
   updated_at timestamp [not null]
 }
 
@@ -38,6 +41,7 @@ Table games {
   description text
   release_year int
   cover_url varchar(500)
+  backdrop_url varchar(500) [note: "фон сторінки гри; null → арт зі Steam або обкладинка"]
   developer varchar(100)
   created_at timestamp [not null, default: `now()`]
 }
@@ -103,5 +107,15 @@ Table reviews {
   indexes {
     (user_id, game_id) [unique]
     game_id
+  }
+}
+
+Table review_votes {
+  review_id uuid [not null, ref: > reviews.id]
+  user_id uuid [not null, ref: > users.id]
+  value smallint [not null, note: 'CHECK -1 (дизлайк) / 1 (лайк)']
+  created_at timestamp [not null, default: `now()`]
+  indexes {
+    (review_id, user_id) [pk]
   }
 }
