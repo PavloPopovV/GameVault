@@ -109,7 +109,8 @@ export default function CatalogPage() {
         <div className="filters__head">
           <h2>Фільтри</h2>
           {activeCount > 0 && <span className="filters__badge">{activeCount}</span>}
-          <button type="button" className="btn btn--ghost btn--sm filters__close" onClick={() => setFiltersOpen(false)}>Готово</button>
+          <button type="button" className={`btn btn--sm filters__close ${activeCount ? 'btn--primary' : 'btn--ghost'}`}
+            onClick={() => setFiltersOpen(false)}>Готово</button>
         </div>
         <FilterGroup title="Жанр" all="Усі жанри" items={genres} value={genre} onChange={(v) => update({ genre: v })} />
         <FilterGroup title="Платформа" all="Усі платформи" items={platforms} value={platform} onChange={(v) => update({ platform: v })} />
@@ -124,7 +125,8 @@ export default function CatalogPage() {
             {list.data && !list.error && <p className="muted">Знайдено {total} {pluralUk(total, ['гру', 'гри', 'ігор'])}</p>}
           </div>
           <div className="toolbar__actions">
-            <button type="button" className="btn btn--secondary btn--sm filters__toggle" onClick={() => setFiltersOpen(true)}>Фільтри</button>
+            <button type="button" className={`btn btn--sm filters__toggle ${activeCount ? 'btn--primary' : 'btn--secondary'}`}
+              onClick={() => setFiltersOpen(true)}>Фільтри{activeCount > 0 && ` · ${activeCount}`}</button>
             <Select size="sm" value={sort} options={SORTS} onChange={(v) => update({ sort: v })} label="Сортування" />
           </div>
         </div>
