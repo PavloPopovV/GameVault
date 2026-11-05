@@ -12,7 +12,7 @@ import PlayerProgress from '../components/PlayerProgress.jsx';
 import ReviewCard from '../components/ReviewCard.jsx';
 import { prepareAvatar } from '../utils/image.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
-import { STATUSES, formatDate } from '../utils/constants.js';
+import { STATUSES, formatDate, pluralUk } from '../utils/constants.js';
 
 const FieldError = ({ errors, field }) => (errors[field] ? <span className="field__error" role="alert">{errors[field]}</span> : null);
 
@@ -201,9 +201,9 @@ function ProfileStats({ stats: s, reviews }) {
   );
   return (
     <section className="stats">
-      <StatCard value={s.totalGames} label="ігор у бібліотеці" to="/library" cover={covers[0]} />
+      <StatCard value={s.totalGames} label={`${pluralUk(s.totalGames, ['гра', 'гри', 'ігор'])} у бібліотеці`} to="/library" cover={covers[0]} />
       <StatCard value={`${s.completionRate}%`} label="пройдено" to="/library?status=COMPLETED" cover={covers[1]} />
-      <StatCard value={s.reviewsCount} label="рецензій" cover={covers[2]} scrollTo="my-reviews" />
+      <StatCard value={s.reviewsCount} label={pluralUk(s.reviewsCount, ['рецензія', 'рецензії', 'рецензій'])} cover={covers[2]} scrollTo="my-reviews" />
       <StatCard value={`★ ${s.averageGivenRating ?? '—'}`} label="середня оцінка" cover={covers[3]} scrollTo="my-reviews" />
       <StatCard value={s.wishlistCount} label="у Wishlist" to="/wishlist" cover={covers[4]} />
     </section>

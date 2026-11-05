@@ -8,6 +8,7 @@ import ActionsMenu from '../components/ActionsMenu.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import GameCover from '../components/GameCover.jsx';
 import Modal from '../components/Modal.jsx';
+import { pluralUk } from '../utils/constants.js';
 import { EmptyState, ErrorState, Spinner } from '../components/States.jsx';
 
 // API віддає максимум 50 ігор за запит — для адмінки забираємо весь каталог посторінково.
@@ -211,7 +212,7 @@ export default function AdminGamesPage() {
       <div className="admin__head">
         <div>
           <h1 className="page-title">Керування каталогом</h1>
-          <p className="page-lead muted">{games.data ? `${games.data.length} ігор у каталозі` : 'Додавайте, редагуйте й видаляйте ігри'}</p>
+          <p className="page-lead muted">{games.data ? `${games.data.length} ${pluralUk(games.data.length, ['гра', 'гри', 'ігор'])} у каталозі` : 'Додавайте, редагуйте й видаляйте ігри'}</p>
         </div>
         <button type="button" className="btn btn--primary" onClick={() => setEditing('new')} disabled={loading || Boolean(error)}>+ Додати гру</button>
       </div>
