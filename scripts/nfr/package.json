@@ -5,7 +5,8 @@
   "description": "Заміри нефункціональних вимог на продакшні: NFR-1 (час відповіді API) і NFR-3 (адаптивність, браузери)",
   "scripts": {
     "latency": "node latency.mjs",
-    "browsers": "node browsers.mjs"
+    "browsers": "node browsers.mjs",
+    "smoke": "node smoke.mjs"
   },
   "dependencies": {
     "playwright": "1.48.2"
