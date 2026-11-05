@@ -60,8 +60,8 @@ export default function AuthPage({ mode }) {
   );
 
   return (
-    <div className="auth">
-      <PageBackdrop image={AUTH_BACKDROP} />
+    <div className="auth auth--hero">
+      <PageBackdrop image={AUTH_BACKDROP} variant="hero" />
       <div className="auth__card card liquid">
         <div className="auth__brand">
           <img src="/favicon.svg" alt="" width="40" height="40" />
