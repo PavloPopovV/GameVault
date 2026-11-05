@@ -290,13 +290,26 @@ describe('GV-17: керування каталогом (адмін)', () => {
     const login = await api('post', '/auth/login').send({ email: 'ivy@test.dev', password: 'Secret123' });
     const admin = { Authorization: `Bearer ${login.body.token}` };
 
-    const body = { title: 'Admin Quest', releaseYear: 2025, developer: 'Studio', genres: ['RPG'] };
+    const body = {
+      title: 'Admin Quest',
+      releaseYear: 2025,
+      developer: 'Studio',
+      genres: ['RPG'],
+      backdropUrl: 'https://example.com/hero.jpg',
+    };
     expect((await api('post', '/games').set(player).send(body)).status).toBe(403);
     expect((await api('post', '/games').set(admin).send({ title: '' })).status).toBe(400);
 
     const created = await api('post', '/games').set(admin).send(body);
     expect(created.status).toBe(201);
-    expect(created.body).toMatchObject({ slug: 'admin-quest', genres: ['RPG'] });
+    expect(created.body).toMatchObject({
+      slug: 'admin-quest',
+      genres: ['RPG'],
+      backdropUrl: 'https://example.com/hero.jpg',
+    });
+    expect(
+      (await api('post', '/games').set(admin).send({ title: 'Bad Backdrop', backdropUrl: 'not-a-url' })).status,
+    ).toBe(400);
 
     const dup = await api('post', '/games').set(admin).send({ title: 'admin quest' });
     expect(dup.status).toBe(409);
@@ -306,9 +319,9 @@ describe('GV-17: керування каталогом (адмін)', () => {
 
     const upd = await api('patch', `/games/${created.body.id}`)
       .set(admin)
-      .send({ title: 'Admin Quest', developer: null, releaseYear: null, genres: [] });
+      .send({ title: 'Admin Quest', developer: null, releaseYear: null, backdropUrl: null, genres: [] });
     expect(upd.status).toBe(200);
-    expect(upd.body).toMatchObject({ developer: null, releaseYear: null, genres: [] });
+    expect(upd.body).toMatchObject({ developer: null, releaseYear: null, backdropUrl: null, genres: [] });
 
     expect((await api('delete', `/games/${created.body.id}`).set(admin)).status).toBe(204);
     expect((await api('get', `/games/${created.body.id}`)).status).toBe(404);

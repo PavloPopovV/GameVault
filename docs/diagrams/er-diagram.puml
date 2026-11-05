@@ -40,6 +40,7 @@ entity "games" as games {
   description : text
   release_year : int
   cover_url : varchar(500)
+  backdrop_url : varchar(500)
   developer : varchar(100)
   * created_at : timestamp
 }

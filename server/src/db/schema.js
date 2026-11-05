@@ -60,6 +60,8 @@ export const games = pgTable('games', {
   description: text('description'),
   releaseYear: integer('release_year'),
   coverUrl: varchar('cover_url', { length: 500 }),
+  // широкий арт для фону сторінки гри; null → широкий арт зі Steam або обкладинка
+  backdropUrl: varchar('backdrop_url', { length: 500 }),
   developer: varchar('developer', { length: 100 }),
   createdAt: createdAt(),
 });

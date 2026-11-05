@@ -50,6 +50,7 @@ class Game {
   + description: String
   + releaseYear: Integer
   + coverUrl: String
+  + backdropUrl: String
   + developer: String
   + createdAt: Date
   --
