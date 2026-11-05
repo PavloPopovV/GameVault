@@ -41,6 +41,7 @@ Table games {
   description text
   release_year int
   cover_url varchar(500)
+  backdrop_url varchar(500) [note: "фон сторінки гри; null → арт зі Steam або обкладинка"]
   developer varchar(100)
   created_at timestamp [not null, default: `now()`]
 }

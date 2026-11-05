@@ -20,13 +20,14 @@ async function loadAllGames() {
   }
 }
 
-const EMPTY = { title: '', releaseYear: '', developer: '', coverUrl: '', description: '', genres: [], platforms: [] };
+const EMPTY = { title: '', releaseYear: '', developer: '', coverUrl: '', backdropUrl: '', description: '', genres: [], platforms: [] };
 
 const toForm = (g) => ({
   title: g.title,
   releaseYear: g.releaseYear ?? '',
   developer: g.developer ?? '',
   coverUrl: g.coverUrl ?? '',
+  backdropUrl: g.backdropUrl ?? '',
   description: g.description ?? '',
   genres: g.genres ?? [],
   platforms: g.platforms ?? [],
@@ -38,6 +39,7 @@ const toBody = (f) => ({
   releaseYear: f.releaseYear === '' ? null : Number(f.releaseYear),
   developer: f.developer.trim() || null,
   coverUrl: f.coverUrl.trim() || null,
+  backdropUrl: f.backdropUrl.trim() || null,
   description: f.description.trim() || null,
   genres: f.genres,
   platforms: f.platforms,
@@ -48,7 +50,9 @@ function validate(f) {
   if (!f.title.trim()) e.title = "Назва обов'язкова";
   const y = Number(f.releaseYear);
   if (f.releaseYear !== '' && (!Number.isInteger(y) || y < 1970 || y > 2100)) e.releaseYear = 'Рік від 1970 до 2100';
-  if (f.coverUrl.trim() && !/^https?:\/\/\S+$/i.test(f.coverUrl.trim())) e.coverUrl = 'Посилання має починатися з http(s)://';
+  const badUrl = (v) => v.trim() && !/^https?:\/\/\S+$/i.test(v.trim());
+  if (badUrl(f.coverUrl)) e.coverUrl = 'Посилання має починатися з http(s)://';
+  if (badUrl(f.backdropUrl)) e.backdropUrl = 'Посилання має починатися з http(s)://';
   return e;
 }
 
@@ -124,6 +128,13 @@ function GameForm({ game, taxonomy, onSaved, onCancel }) {
             <input type="url" className={`input ${errors.coverUrl ? 'input--error' : ''}`} value={form.coverUrl} onChange={set('coverUrl')}
               placeholder="https://…/library_600x900.jpg" maxLength={500} />
             <FieldError errors={errors} field="coverUrl" />
+          </label>
+          <label className="field">
+            <span className="field__label">Фон сторінки гри <span className="muted">· необов'язково</span></span>
+            <input type="url" className={`input ${errors.backdropUrl ? 'input--error' : ''}`} value={form.backdropUrl} onChange={set('backdropUrl')}
+              placeholder="https://…/library_hero.jpg" maxLength={500} />
+            <span className="field__hint">Широка картинка. Якщо порожньо — широкий арт зі Steam (для обкладинок зі Steam) або сама обкладинка.</span>
+            <FieldError errors={errors} field="backdropUrl" />
           </label>
         </div>
       </div>

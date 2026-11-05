@@ -1,0 +1,1 @@
+ALTER TABLE "games" ADD COLUMN "backdrop_url" varchar(500);

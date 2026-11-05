@@ -41,6 +41,7 @@ const gameBase = {
   description: z.string().trim().max(5000, 'Опис до 5000 символів').nullable().optional(),
   releaseYear: z.number().int().min(1970, 'Рік від 1970').max(2100, 'Рік до 2100').nullable().optional(),
   coverUrl: z.string().url('Некоректне посилання').max(500).nullable().optional(),
+  backdropUrl: z.string().url('Некоректне посилання').max(500).nullable().optional(),
   developer: z.string().trim().max(100, 'Розробник до 100 символів').nullable().optional(),
   genres: z.array(z.string()).optional(),
   platforms: z.array(z.string()).optional(),

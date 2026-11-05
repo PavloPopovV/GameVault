@@ -75,7 +75,8 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
-      <PageBackdrop image={heroUrl(g.coverUrl)} fallback={g.coverUrl} />
+      {/* свій фон від адміна → широкий арт зі Steam → обкладинка */}
+      <PageBackdrop image={g.backdropUrl || heroUrl(g.coverUrl)} fallback={g.coverUrl} />
       <nav className="breadcrumbs"><Link to="/">Каталог</Link> / <span>{g.title}</span></nav>
 
       <section className="game-hero">

@@ -43,6 +43,13 @@
       "when": 1793820473062,
       "tag": "0005_wishlist_excludes_library",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793878860569,
+      "tag": "0006_add_game_backdrop",
+      "breakpoints": true
     }
   ]
 }

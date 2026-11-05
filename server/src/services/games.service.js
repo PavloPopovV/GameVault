@@ -119,6 +119,7 @@ async function findGameRow(idOrSlug) {
       description: games.description,
       releaseYear: games.releaseYear,
       coverUrl: games.coverUrl,
+      backdropUrl: games.backdropUrl,
       developer: games.developer,
       createdAt: games.createdAt,
       averageRating: avgRating,
