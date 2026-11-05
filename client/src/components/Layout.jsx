@@ -1,36 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import NavCounter from './NavCounter.jsx';
+import TabBar from './TabBar.jsx';
+import { Link, NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
 import LiquidGlassFilter from './LiquidGlassFilter.jsx';
-
-// Бейдж-лічильник як у кошика магазину: лише коли є хоча б одна гра.
-// key={value} перезапускає анімацію «підстрибування» при кожній зміні числа.
-function Counter({ value }) {
-  if (!value) return null;
-  return (
-    <span key={value} className="nav__count">
-      {value > 99 ? '99+' : value}
-      <span className="sr-only"> ігор</span>
-    </span>
-  );
-}
 
 export default function Layout() {
   const { user, isAuthenticated } = useAuth();
   const [params] = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
-  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
-  useEffect(() => {
-    if (!menuOpen) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [menuOpen]);
   useEffect(() => { setQ(params.get('q') ?? ''); }, [params]);
 
   const onSearch = (e) => {
@@ -58,16 +39,13 @@ export default function Layout() {
             />
           </form>
 
-          <button type="button" className="burger" aria-label="Меню" aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>
-            <span /><span /><span />
-          </button>
 
-          <nav className={`nav ${menuOpen ? 'nav--open' : ''}`}>
+          <nav className="nav" aria-label="Основна навігація">
             <NavLink to="/" end className="nav__link">Каталог</NavLink>
             {isAuthenticated && (
               <>
-                <NavLink to="/library" className="nav__link">Моя бібліотека<Counter value={user.stats?.totalGames} /></NavLink>
-                <NavLink to="/wishlist" className="nav__link">Wishlist<Counter value={user.stats?.wishlistCount} /></NavLink>
+                <NavLink to="/library" className="nav__link">Моя бібліотека<NavCounter value={user.stats?.totalGames} /></NavLink>
+                <NavLink to="/wishlist" className="nav__link">Wishlist<NavCounter value={user.stats?.wishlistCount} /></NavLink>
                 {user.role === 'ADMIN' && <NavLink to="/admin/games" className="nav__link">Адмінка</NavLink>}
               </>
             )}
@@ -86,6 +64,8 @@ export default function Layout() {
       <main className="main container">
         <Outlet />
       </main>
+
+      <TabBar user={user} isAuthenticated={isAuthenticated} />
 
       <footer className="footer">
         <div className="container">GameVault · Проєктний практикум, 2026</div>

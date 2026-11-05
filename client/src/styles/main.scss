@@ -55,27 +55,44 @@ p { margin: 0; }
   &.active { background: transparent; box-shadow: none; .avatar { box-shadow: 0 0 0 2px var(--accent); } }
 }
 .nav__profile-label { display: none; }
-.burger {
-  display: none; margin-left: auto; width: var(--control-h-sm); height: var(--control-h-sm); border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surface); flex-direction: column; justify-content: center; align-items: center; gap: 4px; cursor: pointer;
-  span { width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
-}
 @media (max-width: $bp-md) {
   .header__inner { gap: 12px; }
-  .burger { display: flex; }
   .search { max-width: none; }
-  .nav {
-    display: none; position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch;
-    padding: 12px 16px 16px; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
-    &.nav--open { display: flex; }
-  }
-  .nav__profile { margin: 8px 0 0; padding: 0 10px; }
-  .nav__profile-label { display: inline; }
-  .nav__count { position: static; margin-left: 8px; box-shadow: none; }
+  .nav { display: none; } /* на телефонах і планшетах навігація — у нижній панелі (.tabbar) */
 }
 @media (max-width: $bp-sm) { .logo span { display: none; } }
 
 .footer { border-top: 1px solid var(--border); padding: 20px 0; color: var(--muted); font-size: 13px; }
+
+/* ---------- Нижня панель вкладок (мобільні) ---------- */
+:root { --tabbar-h: 64px; --safe-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar { display: none; }
+@media (max-width: $bp-md) {
+  .app { padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom)); } /* футер і контент не ховаються під панель */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex;
+    height: calc(var(--tabbar-h) + var(--safe-bottom)); padding: 0 6px var(--safe-bottom);
+    background: rgba(10, 10, 12, 0.92); border-top: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%);
+  }
+  .tabbar__item {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    color: var(--muted); font-size: 11px; font-weight: 600; -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
+    &.active { color: var(--accent); .avatar { box-shadow: 0 0 0 2px var(--accent); } }
+    &:active .tabbar__glyph { transform: scale(0.9); }
+  }
+  .tabbar__glyph { position: relative; display: inline-flex; height: 28px; align-items: center; transition: transform 0.12s; }
+  .tabbar__glyph .nav__count { top: -4px; right: -10px; }
+  .tabbar__label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toasts { bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 12px); right: 12px; left: 12px; max-width: none; }
+}
+
+/* iOS Safari збільшує сторінку при фокусі на полі з шрифтом < 16px (і сторінка «їде» вбік).
+   На сенсорних екранах полям — 16px; масштабування жестом користувачу не забороняємо. */
+@media (pointer: coarse) {
+  input, textarea, select, .search__input { font-size: 16px; }
+}
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -253,7 +270,14 @@ p { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .grid--animated > * { animation: none; } }
 @media (max-width: $bp-md) {
   .catalog { grid-template-columns: minmax(0, 1fr); }
-  .filters { display: none; position: fixed; inset: 0; z-index: 40; border-radius: 0; overflow-y: auto; &.filters--open { display: flex; } }
+  /* фільтри — плаваюча панель у стилі сайту: відступи від країв, рамка, радіус; сторінку позаду затемнено */
+  .filters {
+    display: none; position: fixed; z-index: 40; top: 80px; left: 12px; right: 12px;
+    bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 12px); max-width: 520px; margin: 0 auto;
+    overflow-y: auto; overscroll-behavior: contain;
+    border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65), var(--shadow);
+    &.filters--open { display: flex; animation: modal-in 0.22s var(--ease-out); }
+  }
   .filters__close, .filters__toggle { display: inline-flex; }
 }
 @media (max-width: $bp-sm) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
@@ -631,7 +655,7 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
    Нижче смуга плавно йде в чорне (як обкладинки на картках), і форма стоїть на темному. */
 .backdrop--hero {
   --hero-img: clamp(620px, 72vw, 1000px);
-  --hero-h: calc(var(--hero-img) * 0.56);
+  --hero-h: calc(var(--hero-img) * 0.45); /* менша смуга при тій самій картинці = небо обрізане сильніше, герой вище */
   position: absolute; inset: 0 0 auto 0; height: var(--hero-h); overflow: hidden;
   img {
     position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
@@ -642,12 +666,12 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   /* затемнення під шапкою + м'який перехід у чорне донизу */
   &::after {
     background: linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 62%,
-      rgba(0, 0, 0, 0.6) 80%, rgba(0, 0, 0, 0.9) 92%, #000 100%);
+      rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 18%, rgba(0, 0, 0, 0) 66%,
+      rgba(0, 0, 0, 0.6) 82%, rgba(0, 0, 0, 0.9) 93%, #000 100%);
   }
 }
 .auth--hero {
   /* картка починається біля ніг героя — там, де арт уже майже чорний */
-  padding-top: calc(clamp(620px, 72vw, 1000px) * 0.56 * 0.84 - 100px);
-  @media (max-width: $bp-sm) { padding-top: calc(clamp(620px, 72vw, 1000px) * 0.56 * 0.8 - 90px); }
+  padding-top: calc(clamp(620px, 72vw, 1000px) * 0.36 - 100px);
+  @media (max-width: $bp-sm) { padding-top: calc(clamp(620px, 72vw, 1000px) * 0.34 - 90px); }
 }
