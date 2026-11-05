@@ -104,58 +104,62 @@ export default function CatalogPage() {
   const gridKey = list.data?.items.map((g) => g.id).join('-') ?? '';
 
   return (
-    <div className="catalog">
-      <aside className={`filters card liquid ${filtersOpen ? 'filters--open' : ''}`}>
-        <div className="filters__head">
-          <h2>Фільтри</h2>
-          {activeCount > 0 && <span className="filters__badge">{activeCount}</span>}
-          <button type="button" className={`btn btn--sm filters__close ${activeCount ? 'btn--primary' : 'btn--ghost'}`}
-            onClick={() => setFiltersOpen(false)}>Готово</button>
+    <div className="catalog-page">
+      <div className="toolbar">
+        <div>
+          <h1 className="page-title">{q ? `Пошук: «${q}»` : 'Каталог ігор'}</h1>
+          {list.data && !list.error && <p className="muted">Знайдено {total} {pluralUk(total, ['гру', 'гри', 'ігор'])}</p>}
         </div>
-        <FilterGroup title="Жанр" all="Усі жанри" items={genres} value={genre} onChange={(v) => update({ genre: v })} />
-        <FilterGroup title="Платформа" all="Усі платформи" items={platforms} value={platform} onChange={(v) => update({ platform: v })} />
-        <button type="button" className="btn btn--secondary btn--block filters__reset" disabled={!activeCount}
-          onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>
-      </aside>
-
-      <section className="catalog__content">
-        <div className="toolbar">
-          <div>
-            <h1 className="page-title">{q ? `Пошук: «${q}»` : 'Каталог ігор'}</h1>
-            {list.data && !list.error && <p className="muted">Знайдено {total} {pluralUk(total, ['гру', 'гри', 'ігор'])}</p>}
-          </div>
-          <div className="toolbar__actions">
-            <button type="button" className={`btn btn--sm filters__toggle ${activeCount ? 'btn--primary' : 'btn--secondary'}`}
-              onClick={() => setFiltersOpen(true)}>Фільтри{activeCount > 0 && ` · ${activeCount}`}</button>
-            <Select size="sm" value={sort} options={SORTS} onChange={(v) => update({ sort: v })} label="Сортування" />
-          </div>
+        <div className="toolbar__actions">
+          <button type="button" className={`btn btn--sm filters__toggle ${activeCount ? 'btn--primary' : 'btn--secondary'}`}
+            onClick={() => setFiltersOpen(true)}>Фільтри{activeCount > 0 && ` · ${activeCount}`}</button>
+          <Select size="sm" value={sort} options={SORTS} onChange={(v) => update({ sort: v })} label="Сортування" />
         </div>
+      </div>
 
-        {list.loading && !hasItems && <Spinner label="Завантажуємо ігри…" />}
-        {list.error && <ErrorState error={list.error} onRetry={list.reload} />}
-        {!list.loading && list.data && list.data.items.length === 0 && (
-          <EmptyState title="Ігор не знайдено" text="Спробуйте змінити запит або скинути фільтри."
-            action={<button type="button" className="btn btn--secondary" onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>} />
-        )}
-        {hasItems && (
-          <>
-            {/* Старий список лишається на місці (приглушений), поки вантажиться новий — без стрибків.
-                key міняється з набором ігор, тож нові картки з'являються з анімацією. */}
-            <div key={gridKey} className={`grid grid--animated ${list.loading ? 'grid--busy' : ''}`} aria-busy={list.loading}>
-              {list.data.items.map((game, i) => (
-                <GameCard key={game.id} game={game} index={i} footer={
-                  isAuthenticated ? (
-                    statusOf(game)
-                      ? <LibraryBadge status={statusOf(game)} />
-                      : <button type="button" className="btn btn--outline btn--xs" onClick={() => addToLibrary(game)}>+ У бібліотеку</button>
-                  ) : <Link to="/login" className="btn btn--outline btn--xs">+ У бібліотеку</Link>
-                } />
-              ))}
-            </div>
-            <Pagination page={page} totalPages={list.data.pagination.totalPages} onChange={(p) => { update({ page: String(p) }); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-          </>
-        )}
-      </section>
+      <div className="catalog">
+        <aside className={`filters card liquid ${filtersOpen ? 'filters--open' : ''}`}>
+          <div className="filters__head">
+            <h2>Фільтри</h2>
+            {activeCount > 0 && <span className="filters__badge">{activeCount}</span>}
+            <button type="button" className="modal__close filters__close" onClick={() => setFiltersOpen(false)} aria-label="Закрити фільтри">×</button>
+          </div>
+          <FilterGroup title="Жанр" all="Усі жанри" items={genres} value={genre} onChange={(v) => update({ genre: v })} />
+          <FilterGroup title="Платформа" all="Усі платформи" items={platforms} value={platform} onChange={(v) => update({ platform: v })} />
+          <button type="button" className="btn btn--secondary btn--block filters__reset" disabled={!activeCount}
+            onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>
+          {activeCount > 0 && (
+            <button type="button" className="btn btn--primary btn--block filters__done" onClick={() => setFiltersOpen(false)}>Готово</button>
+          )}
+        </aside>
+
+        <section className="catalog__content">
+          {list.loading && !hasItems && <Spinner label="Завантажуємо ігри…" />}
+          {list.error && <ErrorState error={list.error} onRetry={list.reload} />}
+          {!list.loading && list.data && list.data.items.length === 0 && (
+            <EmptyState title="Ігор не знайдено" text="Спробуйте змінити запит або скинути фільтри."
+              action={<button type="button" className="btn btn--secondary" onClick={() => setParams(new URLSearchParams())}>Скинути фільтри</button>} />
+          )}
+          {hasItems && (
+            <>
+              {/* Старий список лишається на місці (приглушений), поки вантажиться новий — без стрибків.
+                  key міняється з набором ігор, тож нові картки з'являються з анімацією. */}
+              <div key={gridKey} className={`grid grid--animated ${list.loading ? 'grid--busy' : ''}`} aria-busy={list.loading}>
+                {list.data.items.map((game, i) => (
+                  <GameCard key={game.id} game={game} index={i} footer={
+                    isAuthenticated ? (
+                      statusOf(game)
+                        ? <LibraryBadge status={statusOf(game)} />
+                        : <button type="button" className="btn btn--outline btn--xs" onClick={() => addToLibrary(game)}>+ У бібліотеку</button>
+                    ) : <Link to="/login" className="btn btn--outline btn--xs">+ У бібліотеку</Link>
+                  } />
+                ))}
+              </div>
+              <Pagination page={page} totalPages={list.data.pagination.totalPages} onChange={(p) => { update({ page: String(p) }); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            </>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

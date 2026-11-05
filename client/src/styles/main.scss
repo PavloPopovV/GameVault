@@ -259,7 +259,7 @@ p { margin: 0; }
 }
 .filter-chip--active, .filter-chip--active:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 .filters__reset:disabled { opacity: 0.4; }
-.filters__close, .filters__toggle { display: none; }
+.filters__close, .filters__toggle, .filters__done { display: none; }
 .filters__group { display: flex; flex-direction: column; }
 .toolbar { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
 .toolbar__actions { display: flex; gap: 8px; }
@@ -272,13 +272,15 @@ p { margin: 0; }
   .catalog { grid-template-columns: minmax(0, 1fr); }
   /* фільтри — плаваюча панель у стилі сайту: відступи від країв, рамка, радіус; сторінку позаду затемнено */
   .filters {
-    display: none; position: fixed; z-index: 40; top: 80px; left: 12px; right: 12px;
-    bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 12px); max-width: 520px; margin: 0 auto;
+    /* висота — за вмістом (без порожнечі знизу), але не вище за екран між шапкою і нижньою панеллю */
+    display: none; position: fixed; z-index: 40; top: 80px; left: 12px; right: 12px; max-width: 520px; margin: 0 auto;
+    max-height: calc(100dvh - 80px - var(--tabbar-h) - var(--safe-bottom) - 12px);
     overflow-y: auto; overscroll-behavior: contain;
     border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65), var(--shadow);
     &.filters--open { display: flex; animation: modal-in 0.22s var(--ease-out); }
   }
   .filters__close, .filters__toggle { display: inline-flex; }
+  .filters__done { display: flex; margin-top: -8px; }
 }
 @media (max-width: $bp-sm) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
 
@@ -332,6 +334,7 @@ p { margin: 0; }
 .btn-icon--danger:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.1); }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; }
 .pagination__gap { color: var(--muted); padding: 0 4px; }
+.pagination .chip { width: 36px; min-width: 36px; height: 36px; padding: 0; border-radius: 50%; font-variant-numeric: tabular-nums; } /* круглі, а не овальні */
 
 /* ---------- Game page ---------- */
 .breadcrumbs { color: var(--muted); font-size: 14px; margin-bottom: 24px; a:hover { color: var(--text); } }
