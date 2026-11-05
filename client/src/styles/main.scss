@@ -631,7 +631,7 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
    Нижче смуга плавно йде в чорне (як обкладинки на картках), і форма стоїть на темному. */
 .backdrop--hero {
   --hero-img: clamp(620px, 72vw, 1000px);
-  --hero-h: calc(var(--hero-img) * 0.56);
+  --hero-h: calc(var(--hero-img) * 0.45); /* менша смуга при тій самій картинці = небо обрізане сильніше, герой вище */
   position: absolute; inset: 0 0 auto 0; height: var(--hero-h); overflow: hidden;
   img {
     position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
@@ -642,12 +642,12 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
   /* затемнення під шапкою + м'який перехід у чорне донизу */
   &::after {
     background: linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0) 62%,
-      rgba(0, 0, 0, 0.6) 80%, rgba(0, 0, 0, 0.9) 92%, #000 100%);
+      rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 18%, rgba(0, 0, 0, 0) 66%,
+      rgba(0, 0, 0, 0.6) 82%, rgba(0, 0, 0, 0.9) 93%, #000 100%);
   }
 }
 .auth--hero {
   /* картка починається біля ніг героя — там, де арт уже майже чорний */
-  padding-top: calc(clamp(620px, 72vw, 1000px) * 0.56 * 0.84 - 100px);
-  @media (max-width: $bp-sm) { padding-top: calc(clamp(620px, 72vw, 1000px) * 0.56 * 0.8 - 90px); }
+  padding-top: calc(clamp(620px, 72vw, 1000px) * 0.36 - 100px);
+  @media (max-width: $bp-sm) { padding-top: calc(clamp(620px, 72vw, 1000px) * 0.34 - 90px); }
 }
