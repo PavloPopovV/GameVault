@@ -377,7 +377,14 @@ p { margin: 0; }
 .vote--up.vote--active { border-color: rgba(34, 197, 94, 0.55); background: rgba(34, 197, 94, 0.14); color: #fff; }
 .vote--down.vote--active { border-color: rgba(239, 68, 68, 0.55); background: rgba(239, 68, 68, 0.14); color: #fff; }
 .vote--static { cursor: default; &:hover { border-color: var(--border); color: var(--text-soft); } &:active { transform: none; } }
-@media (max-width: $bp-sm) { .review-card__head { flex-wrap: wrap; } .review-card__side { margin-left: 0; width: 100%; justify-content: space-between; } }
+@media (max-width: $bp-sm) {
+  .review-card__head { flex-wrap: wrap; }
+  .review-card__side { margin-left: 0; width: 100%; justify-content: space-between; }
+  /* «⋯» — завжди у верхньому правому куті картки (звичний патерн), а не в рядку з лайками */
+  .review-card { position: relative; }
+  .review-card__menu { position: absolute; top: 8px; right: 8px; margin: 0; }
+  .review-card:has(.review-card__menu) .review-card__head { padding-right: 36px; }
+}
 .review-card__text { color: var(--text-soft); white-space: pre-line; }
 .review-card__text--clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .review-card__date { font-size: 13px; color: var(--muted); }
@@ -405,7 +412,10 @@ p { margin: 0; }
   background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); animation: modal-fade 0.18s ease-out;
 }
 .modal__dialog {
-  width: 100%; max-width: 480px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 24px;
+  /* dvh — висота без панелей браузера на телефоні: зі 100vh модалка вилазила за екран зверху й знизу */
+  width: 100%; max-width: 480px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 24px;
+  overscroll-behavior: contain;
+  @media (max-width: $bp-sm) { padding: 20px 16px; }
   box-shadow: var(--shadow); animation: modal-in 0.22s var(--ease-out);
 }
 .modal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
@@ -618,31 +628,33 @@ a.stat:hover { border-color: var(--accent-line); transform: translateY(-2px); .s
 
 /* ---------- Admin: керування каталогом ---------- */
 .modal__dialog--wide { max-width: 720px; }
-.admin__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; .page-lead { margin-bottom: 16px; } }
+.admin__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; .page-lead { margin-bottom: 16px; } }
 .admin__search { width: 100%; max-width: 420px; margin-bottom: 20px; }
 .admin__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .admin-row {
-  display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto; align-items: center; gap: 16px;
+  /* інфо, рейтинг і «⋯» притиснуті до верху рядка — як на картках рецензій */
+  display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto; align-items: start; gap: 16px;
   padding: 10px 12px 10px 10px; border-radius: var(--radius); border: 1px solid var(--border);
   transition: border-color 0.15s; &:hover { border-color: var(--border-hover); }
 }
-.admin-row__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.admin-row__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-top: 4px; }
 .admin-row__title { font-weight: 700; color: var(--text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; &:hover { color: var(--accent); } }
 .admin-row__meta { font-size: 13px; color: var(--text-soft); }
 .admin-row__tags { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.admin-row__stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.admin-row__stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-top: 4px; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .admin-form__top { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: start; }
 .admin-form__preview .cover { width: 120px; }
-.admin-form__main { display: flex; flex-direction: column; gap: 16px; }
+.admin-form__main { display: flex; flex-direction: column; gap: 16px; min-width: 0; .input { width: 100%; } }
 .admin-form__row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; }
 .admin-form__chips { border: 0; margin: 0; padding: 0; min-width: 0; legend { padding: 0; margin-bottom: 8px; } }
 .admin-form__count { color: var(--accent); }
 @media (max-width: 600px) {
   .admin-row { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; .cover--sm { width: 48px; } }
   .admin-row__stats { display: none; }
-  .admin-form__top { grid-template-columns: 1fr; }
+  /* minmax(0, 1fr): інакше поле з власною мінімальною шириною розпирає колонку за край модалки */
+  .admin-form__top { grid-template-columns: minmax(0, 1fr); }
   .admin-form__preview { display: none; }
-  .admin-form__row { grid-template-columns: 1fr; }
+  .admin-form__row { grid-template-columns: minmax(0, 1fr); }
   .admin__head { margin-bottom: 12px; .btn { width: 100%; } }
 }
 // Скло (.liquid) створює власний stacking context — рядок з відкритим меню піднімаємо над сусідами

@@ -75,7 +75,7 @@ export default function GamePage() {
 
   return (
     <div className="game-page">
-      <PageBackdrop image={heroUrl(g.coverUrl)} />
+      <PageBackdrop image={heroUrl(g.coverUrl)} fallback={g.coverUrl} />
       <nav className="breadcrumbs"><Link to="/">Каталог</Link> / <span>{g.title}</span></nav>
 
       <section className="game-hero">
