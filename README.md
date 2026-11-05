@@ -216,7 +216,7 @@ GameVault/
 | --- | --- | --- |
 | Попов П. ([@PavloPopovV](https://github.com/PavloPopovV)) | Tech Lead / Full-stack Developer | архітектура, бекенд, БД, фронтенд, деплой, Code Review |
 | Троць М. | Product Owner | бачення продукту, User Stories, пріоритети беклогу (MoSCoW) |
-| Дерефінка Я. | Scrum Master | Scrum-дошка, спринти, Daily, ретроспективи |
+| Дерефінка Р. | Scrum Master | Scrum-дошка, спринти, Daily, ретроспективи |
 | Білаш Д. | UI/UX Designer + Frontend Developer | wireframes у Figma, інтерфейс |
 | Кость Д. | QA Engineer | тест-кейси, баг-репорти, Smoke Test Suite, coverage |
 | Семенович О. | Technical Writer | README, User Guide, документація |
