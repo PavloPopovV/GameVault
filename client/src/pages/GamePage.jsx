@@ -70,6 +70,15 @@ export default function GamePage() {
   const deleteReview = async (id) => {
     try { await api.deleteReview(id); await afterReview('Рецензію видалено'); } catch (err) { toast.error(err.message); throw err; }
   };
+  // Як і писати рецензію, оцінювати чужі можна лише з грою в бібліотеці; зняти свій голос — завжди
+  const voteReview = (id, value) => {
+    if (!isAuthenticated) { requireLogin(); return null; }
+    if (value !== 0 && !me?.libraryStatus) {
+      toast.info('Щоб оцінювати рецензії, спочатку додайте гру в бібліотеку');
+      return null;
+    }
+    return api.voteReview(id, value);
+  };
   // Адмін модерує будь-які рецензії (сервер це дозволяє через canModifyReview)
   const isAdmin = user?.role === 'ADMIN';
 
@@ -148,7 +157,7 @@ export default function GamePage() {
             <ReviewCard key={r.id} review={r} mine={mine}
               media={<Avatar name={r.author.username} avatarUrl={r.author.avatarUrl} size="lg" />}
               title={r.author.username}
-              onVote={isAuthenticated ? (v) => api.voteReview(r.id, v) : () => { requireLogin(); return null; }}
+              onVote={(v) => voteReview(r.id, v)}
               onUpdate={canManage ? (body) => updateReview(r.id, body) : undefined}
               onDelete={canManage ? () => deleteReview(r.id) : undefined}
               moderation={isAdmin && !mine} />
