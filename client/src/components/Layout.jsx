@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import NavCounter from './NavCounter.jsx';
 import TabBar from './TabBar.jsx';
-import { Link, NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
 import LiquidGlassFilter from './LiquidGlassFilter.jsx';
@@ -11,6 +11,9 @@ export default function Layout() {
   const [params] = useSearchParams();
   const [q, setQ] = useState(params.get('q') ?? '');
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // на сторінках входу й реєстрації пошук у шапці не потрібен
+  const showSearch = !['/login', '/register'].includes(pathname);
 
   useEffect(() => { setQ(params.get('q') ?? ''); }, [params]);
 
@@ -32,12 +35,14 @@ export default function Layout() {
             <span className="brand-name">GameVault</span>
           </Link>
 
-          <form className="search" onSubmit={onSearch} role="search">
-            <input
-              type="search" value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Пошук гри…" aria-label="Пошук гри" className="search__input"
-            />
-          </form>
+          {showSearch && (
+            <form className="search" onSubmit={onSearch} role="search">
+              <input
+                type="search" value={q} onChange={(e) => setQ(e.target.value)}
+                placeholder="Пошук гри…" aria-label="Пошук гри" className="search__input"
+              />
+            </form>
+          )}
 
 
           <nav className="nav" aria-label="Основна навігація">
