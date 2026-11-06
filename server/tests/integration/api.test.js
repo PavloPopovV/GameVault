@@ -265,6 +265,9 @@ describe('Review votes API', () => {
     expect((await api('put', `/reviews/${review.id}/vote`).set(author).send({ value: 1 })).status).toBe(403);
     expect((await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 5 })).status).toBe(400);
     expect((await api('put', `/reviews/${review.id}/vote`).send({ value: 1 })).status).toBe(401);
+    // гри немає в бібліотеці голосувальника — оцінювати рецензію не можна
+    expect((await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 1 })).status).toBe(403);
+    await api('post', '/library').set(voter).send({ gameId });
 
     const like = await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 1 });
     expect(like.body).toMatchObject({ likes: 1, dislikes: 0, myVote: 1 });
@@ -278,6 +281,12 @@ describe('Review votes API', () => {
 
     const off = await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 0 });
     expect(off.body).toMatchObject({ likes: 0, dislikes: 0, myVote: 0 });
+
+    // гру прибрали з бібліотеки — голос знімається разом з нею
+    await api('put', `/reviews/${review.id}/vote`).set(voter).send({ value: 1 });
+    await api('delete', `/library/${gameId}`).set(voter);
+    const afterRemove = (await api('get', `/games/${gameId}/reviews`)).body.find((r) => r.id === review.id);
+    expect(afterRemove).toMatchObject({ likes: 0, dislikes: 0 });
   });
 });
 

@@ -1,6 +1,6 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { libraryEntries, reviews, wishlistItems } from '../db/schema.js';
+import { libraryEntries, reviewVotes, reviews, wishlistItems } from '../db/schema.js';
 import { applyStatusChange, canAddToWishlist } from '../domain/library.js';
 import { conflict, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
@@ -61,6 +61,9 @@ export async function removeFromLibrary(userId, gameId) {
       .returning({ id: libraryEntries.id });
     if (!res.length) throw notFound('Гри немає у вашій бібліотеці');
     await tx.delete(reviews).where(and(eq(reviews.userId, userId), eq(reviews.gameId, gameId)));
+    // Голосувати можна лише за рецензії на гру з бібліотеки, тож разом з грою знімаємо й голоси
+    const gameReviews = tx.select({ id: reviews.id }).from(reviews).where(eq(reviews.gameId, gameId));
+    await tx.delete(reviewVotes).where(and(eq(reviewVotes.userId, userId), inArray(reviewVotes.reviewId, gameReviews)));
   });
 }
 

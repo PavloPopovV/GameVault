@@ -2,7 +2,7 @@ import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { libraryEntries, profiles, reviewVotes, reviews, users } from '../db/schema.js';
 import { avatarPath } from '../domain/avatar.js';
-import { canModifyReview, canReviewGame, validateVote } from '../domain/review.js';
+import { canModifyReview, canReviewGame, canVoteReview, validateVote } from '../domain/review.js';
 import { badRequest, conflict, forbidden, notFound } from '../utils/errors.js';
 import { ensureGameExists } from './games.service.js';
 
@@ -43,6 +43,10 @@ export async function voteReview(user, reviewId, value) {
   if (!review) throw notFound('Рецензію не знайдено');
   const error = validateVote(review, user, value);
   if (error) throw review.userId === user.id ? forbidden(error) : badRequest(error);
+  const entry = await db.query.libraryEntries.findFirst({
+    where: and(eq(libraryEntries.userId, user.id), eq(libraryEntries.gameId, review.gameId)),
+  });
+  if (!canVoteReview(entry, value)) throw forbidden('Щоб оцінювати рецензії, спочатку додайте гру в бібліотеку');
   if (value === 0) {
     await db.delete(reviewVotes).where(and(eq(reviewVotes.reviewId, reviewId), eq(reviewVotes.userId, user.id)));
   } else {

@@ -46,6 +46,14 @@ export function validateVote(review, user, value) {
   return null;
 }
 
+/**
+ * Чи може користувач поставити 👍 / 👎 рецензії: як і для написання рецензії, гра має бути
+ * в його бібліотеці. Зняти свій голос (value = 0) можна завжди.
+ */
+export function canVoteReview(libraryEntry, value) {
+  return value === 0 || Boolean(libraryEntry);
+}
+
 /** Повторний клік по тій самій кнопці знімає голос, по іншій — перемикає. */
 export function toggleVote(current, clicked) {
   return current === clicked ? 0 : clicked;

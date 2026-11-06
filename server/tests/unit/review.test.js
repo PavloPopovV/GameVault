@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateReview, canModifyReview, canReviewGame, validateVote, toggleVote } from '../../src/domain/review.js';
+import { validateReview, canModifyReview, canReviewGame, canVoteReview, validateVote, toggleVote } from '../../src/domain/review.js';
 
 const okText = 'Чудова гра, рекомендую всім!';
 
@@ -83,6 +83,13 @@ describe('голоси за рецензії', () => {
   });
   it('validateVote: за власну рецензію — помилка', () => {
     expect(validateVote(review, { id: 'author' }, 1)).toMatch(/власну/);
+  });
+  it('canVoteReview: гра в бібліотеці — можна ставити 👍 / 👎', () => {
+    for (const v of [1, -1]) expect(canVoteReview({ gameId: 'g1', status: 'PLAYING' }, v)).toBe(true);
+  });
+  it('canVoteReview: гри немає в бібліотеці — не можна, але зняти голос можна', () => {
+    for (const v of [1, -1]) expect(canVoteReview(null, v)).toBe(false);
+    expect(canVoteReview(null, 0)).toBe(true);
   });
   it('toggleVote: повторний клік знімає голос, інший — перемикає', () => {
     expect(toggleVote(0, 1)).toBe(1);
