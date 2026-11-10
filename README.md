@@ -1,3 +1,5 @@
+![GameVault — особистий каталог геймера](docs/banner.jpg)
+
 # 🎮 GameVault — особистий каталог геймера
 
 [![CI](https://github.com/PavloPopovV/GameVault/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/PavloPopovV/GameVault/actions/workflows/ci.yml)
